@@ -108,8 +108,9 @@
       height: auto;
       display: block;
       opacity: 0;
-      animation: dropIn 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-      animation-delay: 0.5s;
+      animation: dropIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: 0.1s; /* Se reduce el delay para que entre de inmediato sin parpadear */
+      will-change: transform, opacity; /* Optimiza el rendimiento en la GPU del navegador */
     }
 
     @media (min-width: 769px) {
