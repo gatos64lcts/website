@@ -39,12 +39,28 @@
 
     html, body {
       margin: 0;
-      padding: 0;
-      background-color: #000000; /* Fondo base oscuro para el canvas dinámico */
+      padding: 0.1px; /* Evita colapsos de margen */
+      background-color: #000000;
       color: #ffffff;
       font-family: 'RelicusMono', monospace;
       min-height: 100vh;
       overflow-x: hidden !important;
+    }
+
+    /* CONTENEDOR DEL FONDO DINÁMICO 3D */
+    .topography-container {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+    }
+
+    .topography-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     /* CONTENEDOR PRINCIPAL */
@@ -55,7 +71,8 @@
       position: relative;
       z-index: 2;
     }
-    /* 1. TÍTULO ENTRADA                  */
+
+    /* 1. TÍTULO ENTRADA */
     .title-entrance-container {
       display: flex;
       justify-content: center;
@@ -84,19 +101,11 @@
     }
 
     @keyframes dropIn {
-      0% {
-        opacity: 0;
-        transform: translateY(-80px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      0% { opacity: 0; transform: translateY(-80px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
-    /* ---------------------------------- */
-    /* 2. TEXTO CONTEXTO (TYPEWRITER)    */
-    /* ---------------------------------- */
+    /* 2. TEXTO CONTEXTO (TYPEWRITER) */
     .mophra-tw-container {
       width: 100%;
       max-width: 620px;
@@ -139,67 +148,41 @@
       flex-shrink: 0;
     }
 
-    .mophra-line-1 {
-      animation: mophraType1 1.5s steps(54, end) 0.6s forwards;
-    }
-    .mophra-cursor-1 {
-      animation: mophraBlink 0.5s infinite 0.6s, mophraHide 0.01s forwards 2.1s;
-    }
-
-    .mophra-line-2 {
-      animation: mophraType2 1.5s steps(55, end) 2.1s forwards;
-    }
-    .mophra-cursor-2 {
-      animation: mophraBlink 0.5s infinite 2.1s, mophraHide 0.01s forwards 3.6s;
-    }
-
-    .mophra-line-3 {
-      animation: mophraType3 0.8s steps(22, end) 3.6s forwards;
-    }
-    .mophra-cursor-3 {
-      animation: mophraBlink 0.5s infinite 3.6s;
-    }
+    .mophra-line-1 { animation: mophraType1 1.5s steps(54, end) 0.6s forwards; }
+    .mophra-cursor-1 { animation: mophraBlink 0.5s infinite 0.6s, mophraHide 0.01s forwards 2.1s; }
+    .mophra-line-2 { animation: mophraType2 1.5s steps(55, end) 2.1s forwards; }
+    .mophra-cursor-2 { animation: mophraBlink 0.5s infinite 2.1s, mophraHide 0.01s forwards 3.6s; }
+    .mophra-line-3 { animation: mophraType3 0.8s steps(22, end) 3.6s forwards; }
+    .mophra-cursor-3 { animation: mophraBlink 0.5s infinite 3.6s; }
 
     @keyframes mophraType1 {
       0% { width: 0; }
       99% { width: 54ch; white-space: nowrap; overflow: hidden; }
       100% { width: auto; white-space: normal; overflow: visible; }
     }
-
     @keyframes mophraType2 {
       0% { width: 0; }
       99% { width: 55ch; white-space: nowrap; overflow: hidden; }
       100% { width: auto; white-space: normal; overflow: visible; }
     }
-
     @keyframes mophraType3 {
       0% { width: 0; }
       99% { width: 22ch; white-space: nowrap; overflow: hidden; }
       100% { width: auto; white-space: normal; overflow: visible; }
     }
-
-    @keyframes mophraBlink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    @keyframes mophraHide {
-      to { opacity: 0; display: none; }
-    }
+    @keyframes mophraBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    @keyframes mophraHide { to { opacity: 0; display: none; } }
 
     @media (min-width: 480px) {
       .mophra-line-text { font-size: 13px; letter-spacing: normal; }
       .mophra-cursor { width: 7px; height: 14px; }
     }
-
     @media (min-width: 769px) {
       .mophra-line-text { font-size: 17px; }
       .mophra-cursor { width: 8px; height: 15px; }
     }
 
-    /* ---------------------------------- */
-    /* 3. FORMULARIO Y MODAL             */
-    /* ---------------------------------- */
+    /* 3. FORMULARIO Y MODAL */
     .demo-form-wrap {
       width: 100%;
       max-width: 440px;
@@ -240,7 +223,7 @@
     .demo-form-group input,
     .demo-form-group textarea {
       font-family: monospace, Courier, monospace;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 0px;
       padding: 13px 15px;
@@ -255,13 +238,13 @@
     .demo-form-group input:hover,
     .demo-form-group textarea:hover {
       border-color: rgba(255, 255, 255, 0.4);
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.7);
     }
 
     .demo-form-group input:focus,
     .demo-form-group textarea:focus {
       border-color: rgba(255, 255, 255, 0.8);
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.9);
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
     }
 
@@ -343,9 +326,7 @@
       box-sizing: border-box;
     }
 
-    .demo-modal-overlay.active .demo-modal-card {
-      transform: scale(1);
-    }
+    .demo-modal-overlay.active .demo-modal-card { transform: scale(1); }
 
     .demo-modal-card h3 {
       color: #fff;
@@ -381,10 +362,7 @@
       overflow: hidden;
     }
 
-    .progress-ascii-bracket {
-      margin: 0 4px;
-    }
-
+    .progress-ascii-bracket { margin: 0 4px; }
     .progress-ascii-blocks {
       flex-grow: 1;
       height: 14px;
@@ -402,23 +380,14 @@
       width: 0%;
       height: 100%;
       background-color: #fff;
-      background-image: repeating-linear-gradient(
-        90deg,
-        #fff,
-        #fff 8px,
-        transparent 8px,
-        transparent 11px
-      );
+      background-image: repeating-linear-gradient(90deg, #fff, #fff 8px, transparent 8px, transparent 11px);
     }
 
     .demo-modal-overlay.active .progress-ascii-fill {
       animation: fillBlocks 1.8s steps(12, end) forwards;
     }
 
-    @keyframes fillBlocks {
-      from { width: 0%; }
-      to { width: 100%; }
-    }
+    @keyframes fillBlocks { from { width: 0%; } to { width: 100%; } }
 
     .demo-modal-close {
       font-family: 'Relicus', monospace, Courier, monospace;
@@ -435,11 +404,7 @@
       margin: 0 auto;
       display: inline-block;
     }
-
-    .demo-modal-close:hover {
-      opacity: 0.85;
-      transform: translateY(-1px);
-    }
+    .demo-modal-close:hover { opacity: 0.85; transform: translateY(-1px); }
 
     @media (min-width: 769px) {
       .demo-form-wrap { max-width: 620px; }
@@ -452,9 +417,9 @@
 </head>
 <body>
 
-  <!-- FONDO DINÁMICO DE TOPOGRAFÍA EN 3D -->
-  <div style="position: fixed; inset: 0; z-index: -1;">
-    <canvas id="topography-canvas" style="display: block; width: 100%; height: 100%;"></canvas>
+  <!-- CONTENEDOR DEL FONDO DINÁMICO TOPOGRAPHY -->
+  <div class="topography-container">
+    <canvas id="topography-canvas" class="topography-canvas" aria-hidden="true"></canvas>
   </div>
 
   <main class="demos-wrapper">
@@ -504,7 +469,6 @@
   <div id="demo-modal" class="demo-modal-overlay" onclick="cerrarModalDemo(event)">
     <div class="demo-modal-card">
       <h3>[ DEMO RECEIVED ]</h3>
-
       <div class="progress-ascii-wrapper">
         <span class="progress-ascii-bracket">[</span>
         <div class="progress-ascii-blocks">
@@ -512,7 +476,6 @@
         </div>
         <span class="progress-ascii-bracket">]</span>
       </div>
-
       <p>> STATUS: DEMO_UPLOAD_COMPLETE<br>We take the time to listen to each track, we'll be in touch shortly.</p>
       <button type="button" class="demo-modal-close" onclick="cerrarModalDemo(event)">Accept</button>
     </div>
@@ -521,7 +484,6 @@
   <script>
     window.enviarDemoFormulario = async function(e) {
       e.preventDefault();
-
       const form = document.getElementById('mophra-demo-form');
       const submitBtn = document.getElementById('demo-submit-btn');
       const modal = document.getElementById('demo-modal');
@@ -558,20 +520,60 @@
     };
   </script>
 
+  <!-- MOTOR WEBGL DEL FONDO TOPOGRAPHY ADAPTADO A VANILLA JS -->
+  <script>
+    (function() {
+      const canvas = document.getElementById('topography-canvas');
+      if (!canvas) return;
+      const gl = canvas.getContext('webgl2', {
+        alpha: true,
+        premultipliedAlpha: true,
+        antialias: true,
+        depth: true,
+        powerPreference: 'high-performance'
+      });
+      if (!gl) return;
+
+      const FOV = 0.32, NEAR = 0.05, FAR = 160, HEIGHT = 1.7, FREQUENCY = 0.45;
+      let width = window.innerWidth, height = window.innerHeight;
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.max(1, Math.round(width * window.devicePixelRatio));
+        canvas.height = Math.max(1, Math.round(height * window.devicePixelRatio));
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // Render loop activo con líneas y ondas dinámicas estilo topografía en rojo (#ff2b00)
+      let lastTime = performance.now();
+      let travelZ = 0;
+
+      function loop(now) {
+        requestAnimationFrame(loop);
+        const dt = Math.min((now - lastTime) / 1000, 1 / 20);
+        lastTime = now;
+        travelZ += 0.2 * 0.8 * dt;
+
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      }
+      requestAnimationFrame(loop);
+    })();
+  </script>
+
   <div class="mophra-global-container" id="mophraGlobalMenu">
     <div class="mophra-global-overlay"></div>
-
     <button class="mophra-global-btn" id="mophraVectorBtn" title="Ver menú">
       <svg id="mophraSvgLogo" viewBox="0 0 1000 1000" class="mophra-svg-element">
         <path id="mophraVectorPath" fill="#ffffff" d="M486.86,74.1l43.7.72c315.79,23.24,500.51,374.15,332.93,647.91-158.69,259.22-531.3,272.98-709.23,26.4C-45.68,472.05,147.58,85.24,486.86,74.1ZM901.07,465.81c-8.75-115.9-71.16-224.09-164.68-291.82-181.81-131.66-436.09-88.78-565.13,93.5-40.96,57.86-66.79,127.33-72.19,198.31h239.5l90,89.98,54.06-53.99-123.49-126.35,137.92-138.24,3.93-.93,140.01,139.17-123.49,126.35,53.92,52.94,89.14-88.93h240.5ZM499.7,267.88l-107.56,108.29,108.29,107.56,107.56-108.29-108.29-107.56ZM240.07,489.81H98.07c-2.86,10.5.77,21.33,0,32h110.5l31.5-32ZM297.07,489.81h-23.5l-31.5,32h23.5l31.5-32ZM757.07,521.81l-31.5-32h-23.5l32.5,32h22.5ZM902.07,489.81h-143l31.5,32h111.5c-.77-10.67,2.86-21.5,0-32ZM187.07,577.81h85.5l71.03-71.02c.78-1.08.51-1.86,0-2.96-.39-.84-12.26-12.79-13.17-12.95l-54.38,53.41-57.28.72c-2.03.6-27.76,26.59-30.21,29.79-.77,1.01-1.93,1.26-1.49,3.01ZM813.07,577.81l-32.7-32.8-56.28-.72-55.38-53.41c-.91.16-12.78,12.11-13.17,12.95-.51,1.1-.78,1.88,0,2.96l71.03,71.02h86.5ZM710.9,843.65l-.36-115.82-210.12-209.95-210.16,209.63.3,116.29c102.67,64.08,233.16,76.11,347.01,35.03,25.59-9.24,49.76-21.75,73.32-35.18ZM131.07,632.81h144.5l98.48-98.5-12.48-12.48-78.52,78.46-119.46.54-32.52,31.98ZM868.07,632.81l-32.52-31.98-119.46-.54-78.52-78.46c-2.2,3.31-12.84,10.05-11.03,13.96l97.03,97.02h144.5ZM185.07,544.81h-85l4.88,32.42,47.41.37,32.7-32.8ZM900.07,544.81h-86l32.7,32.8,48.41-.37,4.88-32.42ZM871.07,656.81h-156.5l-106-105.98-20.43,21.34,145.93,146.14v109.5c60.22-42.95,108.18-102.77,137-171ZM266.07,827.81v-109.5l145.98-146-21.48-20.54-106,105.04h-155.5c28.8,68.24,76.78,128.03,137,171ZM129.07,600.81h-19l4.01,15,14.99-15ZM890.07,600.81h-20l15.99,16,4.01-16Z"/>
       </svg>
     </button>
-
     <nav class="mophra-signs-nav">
       <a href="/" class="mophra-sign-item">HOME</a>
-      
       <a href="/artists/" class="mophra-sign-item">ARTISTS</a>
-
       <div class="mophra-sign-item mophra-dropdown-wrapper">
         <div class="mophra-sign-header">
           <button type="button" class="mophra-submenu-toggle" id="mophraReleasesToggle" aria-label="Toggle Releases Submenu">
@@ -589,22 +591,19 @@
           <a href="/releases/compilations/" class="mophra-sub-item">Compilations</a>
         </div>
       </div>
-
       <a href="/demos/" class="mophra-sign-item">DEMOS</a>
       <a href="/radio/" class="mophra-sign-item">RADIO</a>
     </nav>
-</div>
-  
+  </div>
+
   <style>
     .mophra-global-container {
       position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
       width: 100% !important; height: 100vh !important;
       background-color: transparent !important;
-      overflow: hidden !important;
-      overflow-x: hidden !important;
+      overflow: hidden !important; overflow-x: hidden !important;
       font-family: 'RelicusMono', monospace !important; user-select: none !important; z-index: 999999 !important; pointer-events: none !important;
     }
-
     @keyframes entradaBoton { 0% { transform: translateY(-100px); opacity: 0; } 70% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
     @keyframes salidaBoton { 0% { transform: translateY(0); opacity: 1; } 30% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
 
@@ -616,7 +615,6 @@
       backdrop-filter: blur(5px) !important; pointer-events: auto !important; padding: 0 !important; opacity: 0 !important;
       transition: background 0.3s, transform 0.3s !important;
     }
-
     .mophra-global-btn.animar-entrada { opacity: 1 !important; animation: entradaBoton 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards !important; }
     .mophra-global-btn.animar-salida { opacity: 1 !important; animation: salidaBoton 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards !important; }
     .mophra-global-btn:hover { background: rgba(255, 255, 255, 0.25) !important; transform: scale(1.05) !important; }
@@ -639,8 +637,7 @@
       position: absolute !important; right: 0 !important; top: 0 !important; height: 100% !important; max-height: 100vh !important;
       display: flex !important; flex-direction: column !important; align-items: flex-end !important;
       padding-right: 40px !important; padding-top: 130px !important; padding-bottom: 30px !important; box-sizing: border-box !important;
-      z-index: 100000 !important; pointer-events: none !important;
-      overflow-y: auto !important; overflow-x: hidden !important;
+      z-index: 100000 !important; pointer-events: none !important; overflow-y: auto !important; overflow-x: hidden !important;
     }
     .mophra-global-container.menu-open .mophra-signs-nav { pointer-events: auto !important; }
 
@@ -691,8 +688,7 @@
     .mophra-submenu {
       display: flex !important; flex-direction: column !important; align-items: flex-end !important;
       max-height: 0 !important; overflow: hidden !important; opacity: 0 !important;
-      transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease !important; margin-top: 0px !important;
-      padding-left: 20px !important;
+      transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease !important; margin-top: 0px !important; padding-left: 20px !important;
     }
     .mophra-dropdown-wrapper.submenu-open .mophra-submenu { max-height: 300px !important; opacity: 1 !important; margin-top: 10px !important; }
 
@@ -709,7 +705,6 @@
       .mophra-sign-item { font-size: clamp(48px, 10vw, 58px) !important; }
       .mophra-sub-item { font-size: clamp(28px, 7vw, 34px) !important; }
       .mophra-signs-nav { padding-right: 15px !important; padding-top: 85px !important; }
-
       .mophra-frolov-icon { width: 26px !important; height: 20px !important; }
       .mophra-frolov-icon span { height: 3px !important; }
       .mophra-dropdown-wrapper.submenu-open .mophra-frolov-icon .line-top { transform: translateY(8.5px) rotate(45deg) !important; }
@@ -722,12 +717,7 @@
     if (!document.getElementById('mophra-global-selection-style')) {
       const selectionStyle = document.createElement('style');
       selectionStyle.id = 'mophra-global-selection-style';
-      selectionStyle.innerHTML = `
-        *::selection, ::selection {
-          background-color: #fae100 !important;
-          color: #030303 !important;
-        }
-      `;
+      selectionStyle.innerHTML = `*::selection, ::selection { background-color: #fae100 !important; color: #030303 !important; }`;
       document.head.appendChild(selectionStyle);
     }
 
@@ -761,17 +751,10 @@
       }
 
       if (relToggle && relWrap) {
-        relToggle.onclick = (e) => {
-          e.preventDefault(); e.stopPropagation();
-          relWrap.classList.toggle('submenu-open');
-        };
+        relToggle.onclick = (e) => { e.preventDefault(); e.stopPropagation(); relWrap.classList.toggle('submenu-open'); };
       }
 
-      toggleBtn.onclick = (e) => {
-        e.preventDefault(); e.stopPropagation();
-        menu.classList.contains('menu-open') ? cerrarMenu() : abrirMenu();
-      };
-
+      toggleBtn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); menu.classList.contains('menu-open') ? cerrarMenu() : abrirMenu(); };
       if (overlay) overlay.onclick = (e) => { e.stopPropagation(); cerrarMenu(); };
       navLinks.forEach(l => l.onclick = () => cerrarMenu());
 
@@ -790,7 +773,6 @@
           timer = setTimeout(() => { void toggleBtn.offsetWidth; toggleBtn.classList.add('animar-entrada'); }, 400);
         }
       }
-
       window.addEventListener('popstate', animar);
       animar();
     }
@@ -801,156 +783,40 @@
   </script>
   <script src="/cortina.js"></script>
 
-  <!-- MOTOR WEBGL DEL FONDO TOPOGRAPHY ADAPTADO A JS NATIVO -->
-  <script>
-    (function() {
-      const canvas = document.getElementById('topography-canvas');
-      if (!canvas) return;
-      const gl = canvas.getContext('webgl2', {
-        alpha: true,
-        premultipliedAlpha: true,
-        antialias: true,
-        depth: true,
-        powerPreference: 'high-performance'
-      });
-      if (!gl) return;
-
-      // Configuración adaptada del componente
-      const settings = {
-        color: '#ff2b00',
-        lineCount: 24,
-        lineWidth: 1.8,
-        elevation: 0.9,
-        foreground: 0.18,
-        tilt: 32,
-        speed: 0.2,
-        direction: [0, 1],
-        glow: 1,
-        depthOfField: 0.29,
-        fog: 0.2,
-        brightness: 1,
-        opacity: 1,
-        mouseInteraction: true,
-        hoverEffect: 'lift',
-        mouseRadius: 0.6,
-        mouseStrength: 0.6,
-        trail: 0.2,
-        clickEffect: 'pulse',
-        markers: -1,
-        glitch: 0,
-        intro: true,
-        lightMode: false
-      };
-
-      // Shaders base y bucle simplificado para ejecución fluida en HTML puro
-      const FOV = 0.32, ORBIT = 9, NEAR = 0.05, FAR = 160, HEIGHT = 1.7, FREQUENCY = 0.45;
-      let width = window.innerWidth, height = window.innerHeight;
-      
-      function resize() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width * window.devicePixelRatio;
-        canvas.height = height * window.devicePixelRatio;
-        gl.viewport(0, 0, canvas.width, canvas.height);
-      }
-      window.addEventListener('resize', resize);
-      resize();
-
-      // Render loop básico de respaldo interactivo
-      let lastTime = performance.now();
-      function loop(now) {
-        requestAnimationFrame(loop);
-        const dt = (now - lastTime) / 1000;
-        lastTime = now;
-        
-        gl.clearColor(0, 0, 0, 1);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      }
-      requestAnimationFrame(loop);
-    })();
-  </script>
 </body>
 <!-- PRECARGA OPTIMIZADA DE LA CORTINA -->
 <link rel="preload" href="../resources/cortina.webp" as="image">
 
-<!-- CORTINA METÁLICA DE TRANSICIÓN -->
 <div id="cortina-transicion" class="cortina-contenedor">
     <img src="../resources/cortina.webp" alt="Cargando..." class="cortina-imagen">
 </div>
 
 <style>
     .cortina-contenedor {
-        position: fixed;
-        top: -15vh;
-        left: 0;
-        width: 100vw;
-        height: 115vh;
-        background-color: #1a1a1a;
-        z-index: 9999999 !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-        pointer-events: none;
-        transform: translateY(0%);
+        position: fixed; top: -15vh; left: 0; width: 100vw; height: 115vh;
+        background-color: #1a1a1a; z-index: 9999999 !important;
+        display: flex; justify-content: center; align-items: center;
+        overflow: hidden; pointer-events: none; transform: translateY(0%);
     }
-
-    .cortina-contenedor.cerrar {
-        pointer-events: auto;
-        transform: translateY(0%);
-        transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.05) !important;
-    }
-
-    .cortina-contenedor.abrir {
-        transform: translateY(-100%);
-        transition: transform 0.7s cubic-bezier(0.6, -0.28, 0.735, 0.045) !important;
-    }
-
-    .cortina-imagen {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+    .cortina-contenedor.cerrar { pointer-events: auto; transform: translateY(0%); transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.05) !important; }
+    .cortina-contenedor.abrir { transform: translateY(-100%); transition: transform 0.7s cubic-bezier(0.6, -0.28, 0.735, 0.045) !important; }
+    .cortina-imagen { width: 100%; height: 100%; object-fit: cover; }
 </style>
 
 <script>
     (function() {
         const cortina = document.getElementById('cortina-transicion');
-
-        function abrirCortina() {
-            if (cortina) {
-                cortina.classList.remove('cerrar');
-                cortina.classList.add('abrir');
-            }
-        }
-
-        window.addEventListener('load', () => {
-            setTimeout(abrirCortina, 100);
-        });
-
-        window.addEventListener('pageshow', (event) => {
-            if (event.persisted && cortina) {
-                cortina.classList.remove('cerrar');
-                cortina.classList.add('abrir');
-            }
-        });
-
+        function abrirCortina() { if (cortina) { cortina.classList.remove('cerrar'); cortina.classList.add('abrir'); } }
+        window.addEventListener('load', () => { setTimeout(abrirCortina, 100); });
+        window.addEventListener('pageshow', (event) => { if (event.persisted && cortina) { cortina.classList.remove('cerrar'); cortina.classList.add('abrir'); } });
         document.addEventListener('click', (e) => {
             const link = e.target.closest('a');
             if (!link) return;
-
             const href = link.getAttribute('href');
             if (href && (href.startsWith('/') || href.startsWith('.')) && !link.getAttribute('target') && !link.hasAttribute('download')) {
                 e.preventDefault();
-                
-                if (cortina) {
-                    cortina.classList.remove('abrir');
-                    cortina.classList.add('cerrar');
-                }
-
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 500);
+                if (cortina) { cortina.classList.remove('abrir'); cortina.classList.add('cerrar'); }
+                setTimeout(() => { window.location.href = href; }, 500);
             }
         });
     })();
