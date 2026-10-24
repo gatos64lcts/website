@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MOPHRA | Alb Disc Archive</title>
+  <title>ultimo intentto</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -83,7 +83,7 @@
 
   <div class="grain-overlay"></div>
 
-  <!-- Header Navigation -->
+  <!-- Header -->
   <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 md:px-12 glass-panel border-b-0 rounded-b-2xl mx-auto max-w-7xl mt-3">
     <div class="flex items-center gap-3">
       <div class="w-3 h-3 rounded-full bg-white animate-pulse"></div>
@@ -106,10 +106,10 @@
     </div>
   </header>
 
-  <!-- WebGL 3D Canvas Container -->
+  <!-- Contenedor 3D -->
   <div id="canvas-container"></div>
 
-  <!-- Main HUD / Metadata Overlay -->
+  <!-- HUD Overlay -->
   <main class="relative z-10 pointer-events-none h-full flex flex-col justify-between p-6 md:p-12 pt-28 pb-10">
 
     <div class="flex justify-between items-start max-w-7xl w-full mx-auto">
@@ -252,7 +252,7 @@
       scene = new THREE.Scene();
 
       camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 0, 5.5);
+      camera.position.set(0, 0, 5.2);
 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -275,150 +275,57 @@
     }
 
     function setupStudioLighting() {
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+      // Luz ambiental suave para no oscurecer texturas
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
       scene.add(ambientLight);
 
-      // Luz direccional clave para generar especularidad en el reverso metálico
-      const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.5);
-      dirLight1.position.set(5, 8, 5);
-      scene.add(dirLight1);
+      // Luz direccional frontal alta para crear el reflejo especular brillante estilo A24 sobre el CD
+      const mainLight = new THREE.DirectionalLight(0xffffff, 2.2);
+      mainLight.position.set(3, 6, 4);
+      scene.add(mainLight);
 
-      // Luz de contra (Rim light) para resaltar bordes
-      const dirLight2 = new THREE.DirectionalLight(0xff3366, 1.5);
-      dirLight2.position.set(-5, -5, -4);
-      scene.add(dirLight2);
-    }
-
-    // Generador dinámico de textura holográfica para el reverso del CD
-    function createHolographicDataBacking() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 512;
-      const ctx = canvas.getContext('2d');
-      const cx = 256, cy = 256;
-
-      // Fondo metálico base
-      const grad = ctx.createRadialGradient(cx, cy, 30, cx, cy, 256);
-      grad.addColorStop(0, '#e2e8f0');
-      grad.addColorStop(0.3, '#cbd5e1');
-      grad.addColorStop(0.7, '#94a3b8');
-      grad.addColorStop(1, '#64748b');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 512, 512);
-
-      // Anillos espectrales estilo CD de datos
-      ctx.lineWidth = 1.5;
-      for (let i = 0; i < 360; i += 2) {
-        const rad = (i * Math.PI) / 180;
-        const colorHue = (i * 2) % 360;
-        ctx.strokeStyle = `hsla(${colorHue}, 70%, 60%, 0.25)`;
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(rad) * 45, cy + Math.sin(rad) * 45);
-        ctx.lineTo(cx + Math.cos(rad) * 250, cy + Math.sin(rad) * 250);
-        ctx.stroke();
-      }
-
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      return texture;
+      // Luz de contra lateral para perfilar los bordes del disco
+      const rimLight = new THREE.DirectionalLight(0xff8888, 1.0);
+      rimLight.position.set(-5, -2, -3);
+      scene.add(rimLight);
     }
 
     function buildDiscsCarousel() {
       const outerRadius = 1.8;
-      const innerRadius = 0.32;
-      const thickness = 0.025; // Grosor sutil pero visible en perfil 3D
+      const innerRadius = 0.32; // Agujero central de CD real
 
-      const shape = new THREE.Shape();
-      shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
-      const holePath = new THREE.Path();
-      holePath.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
-      shape.holes.push(holePath);
-
-      // 1. Geometría extruida ultradelgada para dar volumen real al borde
-      const cdGeometry = new THREE.ExtrudeGeometry(shape, {
-        depth: thickness,
-        bevelEnabled: true,
-        bevelSegments: 2,
-        steps: 1,
-        bevelSize: 0.005,
-        bevelThickness: 0.002,
-        curveSegments: 64
-      });
-      cdGeometry.center();
-
-      // Borde metálico transparente
-      const edgeMaterial = new THREE.MeshStandardMaterial({
-        color: 0xcccccc,
-        metalness: 0.95,
-        roughness: 0.1,
-        transparent: true,
-        opacity: 0.8
-      });
-
-      // 2. Reverso Holográfico Metálico de Datos (Cara Trasera)
-      const dataBackingTexture = createHolographicDataBacking();
-      const backRingGeo = new THREE.RingGeometry(innerRadius, outerRadius, 64, 1);
+      // Anillo plano perfecto para la carátula
+      const cdGeometry = new THREE.RingGeometry(innerRadius, outerRadius, 64);
       
-      // Ajuste de UVs para anillo
-      const posB = backRingGeo.attributes.position;
-      const uvsB = backRingGeo.attributes.uv;
-      for (let i = 0; i < posB.count; i++) {
-        const x = posB.getX(i);
-        const y = posB.getY(i);
-        uvsB.setXY(i, (x / outerRadius + 1) / 2, (y / outerRadius + 1) / 2);
-      }
-
-      const backMaterial = new THREE.MeshStandardMaterial({
-        map: dataBackingTexture,
-        metalness: 0.95,
-        roughness: 0.15,
-        side: THREE.FrontSide
-      });
-
       const textureLoader = new THREE.TextureLoader();
 
       ALBUMS.forEach((album) => {
         const discGroup = new THREE.Group();
 
-        // Malla del cuerpo (Volumen del borde)
-        const cdBodyMesh = new THREE.Mesh(cdGeometry, edgeMaterial);
-        discGroup.add(cdBodyMesh);
-
-        // Malla del reverso holográfico (Mirando hacia atrás)
-        const backMesh = new THREE.Mesh(backRingGeo, backMaterial);
-        backMesh.position.z = -(thickness / 2) - 0.001;
-        backMesh.rotation.y = Math.PI; // Giro hacia la cara trasera
-        discGroup.add(backMesh);
-
-        // 3. Frontal impreso con portada (Cara Delantera)
-        const frontRingGeo = new THREE.RingGeometry(innerRadius, outerRadius, 64, 1);
-        const posF = frontRingGeo.attributes.position;
-        const uvsF = frontRingGeo.attributes.uv;
-        for (let i = 0; i < posF.count; i++) {
-          const x = posF.getX(i);
-          const y = posF.getY(i);
-          uvsF.setXY(i, (x / outerRadius + 1) / 2, (y / outerRadius + 1) / 2);
-        }
-
-        const frontMaterial = new THREE.MeshStandardMaterial({
-          side: THREE.FrontSide,
-          transparent: true,
-          roughness: 0.3,
-          metalness: 0.1
+        // Usamos MeshStandardMaterial para que reaccione a la luz y cree destellos de brillo sobre la imagen
+        const cdMaterial = new THREE.MeshStandardMaterial({
+          roughness: 0.25,  // Bajo para mantener brillo tipo plástico/barniz de CD
+          metalness: 0.15,  // Toque metálico sutil para los reflejos de luz
+          side: THREE.DoubleSide,
+          transparent: true
         });
 
+        // Carga de la textura asegurando visibilidad total sin oscurecerse
         textureLoader.load(
           album.customImage,
           (texture) => {
             texture.colorSpace = THREE.SRGBColorSpace;
-            frontMaterial.map = texture;
-            frontMaterial.needsUpdate = true;
+            cdMaterial.map = texture;
+            cdMaterial.needsUpdate = true;
+          },
+          undefined,
+          (err) => {
+            console.warn("No se pudo cargar la imagen:", album.customImage);
           }
         );
 
-        const frontMesh = new THREE.Mesh(frontRingGeo, frontMaterial);
-        frontMesh.position.z = (thickness / 2) + 0.001;
-        discGroup.add(frontMesh);
+        const cdMesh = new THREE.Mesh(cdGeometry, cdMaterial);
+        discGroup.add(cdMesh);
 
         scene.add(discGroup);
         discMeshes.push(discGroup);
