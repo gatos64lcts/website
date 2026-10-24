@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full text-neutral-100 antialiased selection:bg-white selection:text-black" style="background-color: #F5260A !important;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOPHRA RECS — Compact Disc Archive</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="../resources/favicon.ico">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Three.js Library r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Google Fonts: Inter & Space Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #F5260A !important;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .font-mono {
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* Film Grain Overlay estilo A24 */
+    .grain-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 40;
+      opacity: 0.05;
+      background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>');
+    }
+
+    /* Glassmorphism Blur Panels */
+    .glass-panel {
+      background: rgba(12, 12, 12, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Custom Tracklist Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+    }
+
+    /* Subtle Transitions */
+    .fade-transition {
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      cursor: grab;
+      background-color: #F5260A !important;
+    }
+    #canvas-container:active {
+      cursor: grabbing;
+    }
+  </style>
+</head>
+<body class="h-full relative" style="background-color: #F5260A !important;">
+
+  <!-- Grain Overlay -->
+  <div class="grain-overlay"></div>
+
+  <!-- Header Navigation -->
+  <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 md:px-12 glass-panel border-b-0 rounded-b-2xl mx-auto max-w-7xl mt-3">
+    <div class="flex items-center gap-3">
+      <div class="w-3 h-3 rounded-full bg-white animate-pulse"></div>
+      <a href="https://mophrarecs.com" class="flex items-center gap-2 group">
+        <span class="text-sm font-bold tracking-widest uppercase font-mono text-white group-hover:opacity-80 transition-opacity">MOPHRA RECS</span>
+        <span class="text-[10px] text-neutral-500 font-mono tracking-wider">// CATALOG ARCHIVE</span>
+      </a>
+    </div>
+
+    <div class="flex items-center gap-2 font-mono text-xs tracking-widest">
+      <span id="current-index" class="text-white font-bold">01</span>
+      <span class="text-neutral-600">/</span>
+      <span id="total-count" class="text-neutral-500">04</span>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button id="toggle-autorotate" class="px-3.5 py-1.5 rounded-full border border-neutral-800 text-[11px] font-mono uppercase tracking-wider text-neutral-300 hover:text-white hover:border-neutral-600 transition">
+        Auto-Spin: On
+      </button>
+    </div>
+  </header>
+
+  <!-- WebGL 3D Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Main HUD / Metadata Overlay -->
+  <main class="relative z-10 pointer-events-none h-full flex flex-col justify-between p-6 md:p-12 pt-28 pb-10">
+
+    <div class="flex justify-between items-start max-w-7xl w-full mx-auto">
+      <div id="info-left" class="space-y-1 fade-transition">
+        <p class="text-[10px] font-mono text-neutral-500 tracking-widest uppercase">CATALOG NO.</p>
+        <p id="album-cat" class="text-xs font-mono text-neutral-200">MPH-015</p>
+      </div>
+
+      <div id="info-right" class="text-right space-y-1 fade-transition">
+        <p class="text-[10px] font-mono text-neutral-500 tracking-widest uppercase">RELEASE YEAR</p>
+        <p id="album-year" class="text-xs font-mono text-neutral-200">2026</p>
+      </div>
+    </div>
+
+    <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+      <div id="info-center" class="md:col-span-7 space-y-3 fade-transition">
+        <div class="flex items-center gap-2">
+          <span id="album-genre" class="inline-block px-2.5 py-1 rounded-md bg-neutral-900/80 border border-neutral-800 text-[10px] font-mono tracking-wider uppercase text-neutral-400">
+            BASS / BASS HOUSE
+          </span>
+          <span id="album-format" class="inline-block px-2.5 py-1 rounded-md bg-white/10 border border-white/20 text-[10px] font-mono tracking-wider uppercase text-neutral-200">
+            COMPACT DISC
+          </span>
+        </div>
+        <h1 id="album-title" class="text-4xl md:text-6xl font-light tracking-tight text-white uppercase font-sans">
+          MY LAST SOUND
+        </h1>
+        <p id="album-artist" class="text-sm md:text-base text-neutral-400 font-light tracking-wide">
+          Release by BADDY
+        </p>
+      </div>
+
+      <div class="md:col-span-5 flex flex-col gap-4 items-start md:items-end pointer-events-auto">
+        <!-- Tracklist Box -->
+        <div id="tracklist-container" class="w-full glass-panel rounded-2xl p-4 max-h-40 overflow-y-auto custom-scrollbar fade-transition">
+          <p class="text-[10px] font-mono text-neutral-500 tracking-widest uppercase mb-2">TRACKLIST</p>
+          <ol id="tracklist" class="space-y-1.5 text-xs font-mono text-neutral-300">
+            <!-- Dynamic Track Injection -->
+          </ol>
+        </div>
+
+        <!-- Release Link Button & Controls -->
+        <div class="w-full flex flex-col gap-3">
+          <a id="release-link" href="https://too.fm/baddy-my-last-sound" target="_blank" rel="noopener noreferrer" class="w-full glass-panel px-5 py-3 rounded-xl flex items-center justify-between text-xs font-mono uppercase tracking-wider text-neutral-200 hover:text-white hover:border-white/30 transition group">
+            <span class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+              <span>VIEW OFFICIAL RELEASE</span>
+            </span>
+            <span class="group-hover:translate-x-1 transition-transform">→</span>
+          </a>
+
+          <div class="flex items-center justify-between px-2">
+            <button id="btn-prev" class="w-10 h-10 rounded-full border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white transition glass-panel">←</button>
+            <span class="text-[10px] font-mono text-neutral-400 tracking-wider">DRAG 360° | SCROLL NAVIGATE</span>
+            <button id="btn-next" class="w-10 h-10 rounded-full border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white transition glass-panel">→</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const ALBUMS = [
+      {
+        id: "mylastsound",
+        title: "MY LAST SOUND",
+        artist: "BADDY",
+        year: "2026",
+        cat: "MPH-015",
+        genre: "BASS HOUSE",
+        customImage: "../resources/covers/015-my-last-sound.webp",
+        releaseUrl: "https://too.fm/baddy-my-last-sound",
+        tracks: [
+          "01. My Last Sound (03:42)",
+          "02. CHOKE (04:15)",
+          "03. Backstage (03:10)",
+          "04. Bounce (03:55)"
+        ]
+      },
+      {
+        id: "voidstar",
+        title: "VOIDSTAR",
+        artist: "GEORGE LYCATS & ROBO_AIKO",
+        year: "2026",
+        cat: "MPH-016",
+        genre: "HYBRID TRAP",
+        customImage: "../resources/covers/016-voidstar.webp",
+        releaseUrl: "https://too.fm/mophra016-voidstar",
+        tracks: [
+          "01. voidSTAR (Original Mix) (03:11)",
+          "02. voidSTAR (Extended VIP) (04:33)"
+        ]
+      },
+      {
+        id: "bounce",
+        title: "BOUNCE",
+        artist: "BADDY",
+        year: "2026",
+        cat: "MPH-014",
+        genre: "BASS HOUSE",
+        customImage: "../resources/covers/014-bounce.webp",
+        releaseUrl: "https://too.fm/mophra014-bounce",
+        tracks: [
+          "01. Bounce (Original Mix) (03:22)"
+        ]
+      },
+      {
+        id: "acidrage",
+        title: "ACID RAGE",
+        artist: "KRAITX",
+        year: "2026",
+        cat: "MPH-013",
+        genre: "HARD BASS",
+        customImage: "../resources/covers/013-acidrage.webp",
+        releaseUrl: "https://too.fm/acidrage",
+        tracks: [
+          "01. Acid Rage (03:30)"
+        ]
+      }
+    ];
+
+    let scene, camera, renderer;
+    let discMeshes = [];
+    let autoRotate = true;
+    let currentIndex = 0;
+
+    let targetIndex = 0;
+    let currentScrollProgress = 0;
+    let isScrollingLocked = false;
+
+    let isDragging = false;
+    let dragMoved = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    let userRotX = 0;
+    let userRotY = 0;
+    let targetUserRotX = 0;
+    let targetUserRotY = 0;
+
+    function init() {
+      const container = document.getElementById('canvas-container');
+
+      scene = new THREE.Scene();
+
+      camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 0, 7.5);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+      container.appendChild(renderer.domElement);
+
+      setupStudioLighting();
+      buildDiscsCarousel();
+      updateAlbumUI(ALBUMS[0]);
+
+      document.getElementById('total-count').innerText = String(ALBUMS.length).padStart(2, '0');
+
+      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('wheel', onWindowWheel, { passive: false });
+      window.addEventListener('keydown', handleKeyPress);
+      setupInteractions(container);
+      setupUIControls();
+
+      animate();
+    }
+
+    function setupStudioLighting() {
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+      scene.add(ambientLight);
+
+      const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
+      keyLight.position.set(5, 5, 4);
+      scene.add(keyLight);
+
+      const rimLight1 = new THREE.PointLight(0x38bdf8, 3, 12);
+      rimLight1.position.set(-4, 3, -2);
+      scene.add(rimLight1);
+
+      const rimLight2 = new THREE.PointLight(0xc084fc, 2.5, 12);
+      rimLight2.position.set(4, -3, -2);
+      scene.add(rimLight2);
+    }
+
+    function buildDiscsCarousel() {
+      const textureLoader = new THREE.TextureLoader();
+
+      const outerRadius = 1.8;
+      const innerRadius = 0.28;
+      const hubRadius = 0.55;
+      const thickness = 0.025; // Extrusión delgada para volumen 3D real
+
+      const shape = new THREE.Shape();
+      shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
+      const holePath = new THREE.Path();
+      holePath.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
+      shape.holes.push(holePath);
+
+      const extrudeSettings = {
+        depth: thickness,
+        bevelEnabled: true,
+        bevelSegments: 4,
+        steps: 1,
+        bevelSize: 0.008,
+        bevelThickness: 0.004,
+        curveSegments: 128
+      };
+
+      const cdGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      cdGeometry.center();
+
+      // Material con Reflejos Fotorrealistas e Iridiscencia (Extraído de tu código)
+      const cdMetalMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xdddddd,
+        metalness: 0.95,
+        roughness: 0.15,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.05,
+        iridescence: 0.9,
+        iridescenceIOR: 1.3
+      });
+
+      ALBUMS.forEach((album) => {
+        const discGroup = new THREE.Group();
+
+        // Material frontal optimizado para mostrar la portada con brillo y reflejos
+        const cdFrontMaterial = new THREE.MeshPhysicalMaterial({
+          metalness: 0.3,
+          roughness: 0.2,
+          clearcoat: 0.8,
+          iridescence: 0.3,
+          iridescenceIOR: 1.3
+        });
+
+        // Cargar imagen de forma segura
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = album.customImage;
+
+        img.onload = () => {
+          const texture = new THREE.Texture(img);
+          texture.colorSpace = THREE.SRGBColorSpace;
+          texture.needsUpdate = true;
+          cdFrontMaterial.map = texture;
+          cdFrontMaterial.needsUpdate = true;
+        };
+
+        const cdMesh = new THREE.Mesh(cdGeometry, [cdMetalMaterial, cdFrontMaterial]);
+        discGroup.add(cdMesh);
+
+        // Anillo plástico central
+        const hubShape = new THREE.Shape();
+        hubShape.absarc(0, 0, hubRadius, 0, Math.PI * 2, false);
+        const hubHole = new THREE.Path();
+        hubHole.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
+        hubShape.holes.push(hubHole);
+
+        const hubGeometry = new THREE.ExtrudeGeometry(hubShape, { depth: thickness + 0.002, bevelEnabled: false });
+        hubGeometry.center();
+
+        const plasticHubMaterial = new THREE.MeshPhysicalMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.35,
+          roughness: 0.1,
+          transmission: 0.9,
+          ior: 1.5
+        });
+
+        const hubMesh = new THREE.Mesh(hubGeometry, plasticHubMaterial);
+        discGroup.add(hubMesh);
+
+        scene.add(discGroup);
+        discMeshes.push(discGroup);
+      });
+    }
+
+    function onWindowWheel(e) {
+      e.preventDefault();
+      if (isScrollingLocked) return;
+
+      if (e.deltaY > 0) {
+        targetIndex = Math.min(targetIndex + 1, ALBUMS.length - 1);
+      } else {
+        targetIndex = Math.max(targetIndex - 1, 0);
+      }
+
+      if (targetIndex !== currentIndex) {
+        isScrollingLocked = true;
+        setTimeout(() => { isScrollingLocked = false; }, 350);
+      }
+    }
+
+    function setupInteractions(container) {
+      container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        dragMoved = false;
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
+
+        if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
+          dragMoved = true;
+        }
+
+        targetUserRotY += deltaX * 0.008;
+        targetUserRotX += deltaY * 0.008;
+
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('mouseup', () => { isDragging = false; });
+
+      container.addEventListener('click', () => {
+        if (!dragMoved) {
+          const currentAlbum = ALBUMS[currentIndex];
+          if (currentAlbum && currentAlbum.releaseUrl) {
+            window.open(currentAlbum.releaseUrl, '_blank', 'noopener,noreferrer');
+          }
+        }
+      });
+
+      container.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          dragMoved = false;
+          previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+      });
+
+      window.addEventListener('touchmove', (e) => {
+        if (!isDragging || e.touches.length !== 1) return;
+        const deltaX = e.touches[0].clientX - previousMousePosition.x;
+        const deltaY = e.touches[0].clientY - previousMousePosition.y;
+
+        if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
+          dragMoved = true;
+        }
+
+        targetUserRotY += deltaX * 0.008;
+        targetUserRotX += deltaY * 0.008;
+
+        previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      });
+
+      window.addEventListener('touchend', () => { isDragging = false; });
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === "ArrowRight") targetIndex = Math.min(targetIndex + 1, ALBUMS.length - 1);
+      if (e.key === "ArrowLeft") targetIndex = Math.max(targetIndex - 1, 0);
+    }
+
+    function setupUIControls() {
+      document.getElementById('btn-next').addEventListener('click', () => {
+        targetIndex = Math.min(targetIndex + 1, ALBUMS.length - 1);
+      });
+      document.getElementById('btn-prev').addEventListener('click', () => {
+        targetIndex = Math.max(targetIndex - 1, 0);
+      });
+
+      const autoBtn = document.getElementById('toggle-autorotate');
+      autoBtn.addEventListener('click', () => {
+        autoRotate = !autoRotate;
+        autoBtn.innerText = `Auto-Spin: ${autoRotate ? 'On' : 'Off'}`;
+        autoBtn.classList.toggle('text-white', autoRotate);
+      });
+    }
+
+    function triggerTextReveal(album) {
+      const textElements = [
+        document.getElementById('info-left'),
+        document.getElementById('info-right'),
+        document.getElementById('info-center'),
+        document.getElementById('tracklist-container'),
+        document.getElementById('release-link')
+      ];
+
+      textElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(10px)';
+      });
+
+      targetUserRotX = 0;
+      targetUserRotY = 0;
+
+      setTimeout(() => {
+        document.getElementById('current-index').innerText = String(currentIndex + 1).padStart(2, '0');
+        document.getElementById('album-title').innerText = album.title;
+        document.getElementById('album-artist').innerText = `Release by ${album.artist}`;
+        document.getElementById('album-year').innerText = album.year;
+        document.getElementById('album-cat').innerText = album.cat;
+        document.getElementById('album-genre').innerText = album.genre;
+        document.getElementById('release-link').href = album.releaseUrl;
+
+        updateTracklistUI(album);
+
+        textElements.forEach(el => {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        });
+      }, 250);
+    }
+
+    function updateTracklistUI(album) {
+      const listEl = document.getElementById('tracklist');
+      listEl.innerHTML = '';
+      album.tracks.forEach(track => {
+        const li = document.createElement('li');
+        li.className = 'hover:text-white transition-colors cursor-pointer';
+        li.innerText = track;
+        listEl.appendChild(li);
+      });
+    }
+
+    function updateAlbumUI(album) {
+      document.getElementById('album-title').innerText = album.title;
+      document.getElementById('album-artist').innerText = `Release by ${album.artist}`;
+      document.getElementById('album-year').innerText = album.year;
+      document.getElementById('album-cat').innerText = album.cat;
+      document.getElementById('album-genre').innerText = album.genre;
+      document.getElementById('release-link').href = album.releaseUrl;
+      updateTracklistUI(album);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      currentScrollProgress += (targetIndex - currentScrollProgress) * 0.12;
+
+      const nearestIndex = Math.round(currentScrollProgress);
+      if (nearestIndex !== currentIndex && nearestIndex >= 0 && nearestIndex < ALBUMS.length) {
+        currentIndex = nearestIndex;
+        triggerTextReveal(ALBUMS[currentIndex]);
+      }
+
+      userRotX += (targetUserRotX - userRotX) * 0.08;
+      userRotY += (targetUserRotY - userRotY) * 0.08;
+
+      const spacing = 3.6;
+      const time = Date.now() * 0.001;
+
+      discMeshes.forEach((discGroup, i) => {
+        const offset = i - currentScrollProgress;
+        const posX = offset * spacing;
+        const posZ = -Math.pow(offset, 2) * 1.2;
+        const scale = Math.max(0.45, 0.95 - Math.abs(offset) * 0.4);
+
+        discGroup.position.set(posX, Math.sin(time + i * 1.5) * 0.04, posZ);
+        discGroup.scale.set(scale, scale, scale);
+
+        const cdMesh = discGroup.children[0];
+
+        if (Math.abs(offset) < 0.5) {
+          cdMesh.rotation.x = 0.25 + userRotX;
+          cdMesh.rotation.y = (offset * -0.5) + userRotY;
+          if (autoRotate && !isDragging) {
+            cdMesh.rotation.z += 0.008;
+          }
+        } else {
+          cdMesh.rotation.x = 0.25;
+          cdMesh.rotation.y = offset * -0.5;
+          if (autoRotate) {
+            cdMesh.rotation.z += 0.002;
+          }
+        }
+      });
+
+      renderer.render(scene, camera);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
