@@ -17,11 +17,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
-    body {
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
       font-family: 'Inter', sans-serif;
       overflow: hidden;
       user-select: none;
       -webkit-user-select: none;
+      background-color: #000;
     }
 
     .font-mono {
@@ -62,6 +67,15 @@
     .fade-transition {
       transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+    }
   </style>
 </head>
 <body class="h-full bg-black text-white relative">
@@ -92,8 +106,8 @@
     </div>
   </header>
 
-  <!-- WebGL 3D Canvas -->
-  <div id="canvas-container" class="absolute inset-0 z-0 cursor-grab active:cursor-grabbing"></div>
+  <!-- WebGL 3D Canvas Container -->
+  <div id="canvas-container"></div>
 
   <!-- Main HUD / Metadata Overlay -->
   <main class="relative z-10 pointer-events-none h-full flex flex-col justify-between p-6 md:p-12 pt-28 pb-10">
@@ -291,7 +305,6 @@
       const container = document.getElementById('canvas-container');
 
       scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x000000, 0.08);
 
       camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.set(0, 0, 6.5);
@@ -301,7 +314,13 @@
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
 
-      setupStudioLighting();
+      // Luz ambiental muy alta para asegurar visibilidad total
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 2.0);
+      dirLight.position.set(5, 5, 5);
+      scene.add(dirLight);
 
       cdMeshGroup = new THREE.Group();
       scene.add(cdMeshGroup);
@@ -320,23 +339,6 @@
       animate();
     }
 
-    function setupStudioLighting() {
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
-      scene.add(ambientLight);
-
-      const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
-      keyLight.position.set(5, 5, 4);
-      scene.add(keyLight);
-
-      const rimLight1 = new THREE.PointLight(0x38bdf8, 3, 12);
-      rimLight1.position.set(-4, 3, -2);
-      scene.add(rimLight1);
-
-      const rimLight2 = new THREE.PointLight(0xc084fc, 2.5, 12);
-      rimLight2.position.set(4, -3, -2);
-      scene.add(rimLight2);
-    }
-
     function loadCDMesh(album) {
       while(cdMeshGroup.children.length > 0) {
         const obj = cdMeshGroup.children[0];
@@ -348,7 +350,7 @@
       const hubRadius = 0.55;
       const thickness = 0.03;
 
-      // 1. Cuerpo base del CD (Metal holográfico)
+      // 1. Cuerpo base del CD
       const shape = new THREE.Shape();
       shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
       const holePath = new THREE.Path();
@@ -366,22 +368,16 @@
       });
       cdGeometry.center();
 
-      const cdMetalMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0xdddddd,
-        metalness: 0.95,
-        roughness: 0.15,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.05,
-        reflectivity: 1.0,
-        iridescence: 0.9,
-        iridescenceIOR: 1.3,
-        iridescenceThicknessRange: [100, 400]
+      const cdMetalMaterial = new THREE.MeshStandardMaterial({
+        color: 0xcccccc,
+        metalness: 0.9,
+        roughness: 0.2
       });
 
       const cdBaseMesh = new THREE.Mesh(cdGeometry, cdMetalMaterial);
       cdMeshGroup.add(cdBaseMesh);
 
-      // 2. Malla frontal con compatibilidad para Three.js r128 (THREE.sRGBEncoding)
+      // 2. Malla frontal con imagen o respaldo garantizado
       const textureLoader = new THREE.TextureLoader();
       const ringGeo = new THREE.RingGeometry(innerRadius, outerRadius, 128, 1);
       const pos = ringGeo.attributes.position;
@@ -395,10 +391,8 @@
       }
       ringGeo.attributes.uv.needsUpdate = true;
 
-      const frontArtworkMaterial = new THREE.MeshPhysicalMaterial({
-        metalness: 0.2,
-        roughness: 0.25,
-        clearcoat: 1.0,
+      // Usamos MeshBasicMaterial para evitar que la oscuridad de la escena apague la textura
+      const frontArtworkMaterial = new THREE.MeshBasicMaterial({
         side: THREE.DoubleSide
       });
 
@@ -406,13 +400,13 @@
         textureLoader.load(
           url,
           (texture) => {
-            texture.encoding = THREE.sRGBEncoding; // Corrección clave para r128
+            texture.encoding = THREE.sRGBEncoding;
             frontArtworkMaterial.map = texture;
             frontArtworkMaterial.needsUpdate = true;
           },
           undefined,
           (err) => {
-            console.warn("No se cargó la imagen, usando respaldo:", err);
+            console.warn("Cargando respaldo por código:", err);
             const fallbackTex = textureLoader.load(createFallbackCanvas(album));
             fallbackTex.encoding = THREE.sRGBEncoding;
             frontArtworkMaterial.map = fallbackTex;
@@ -444,13 +438,10 @@
       const hubGeometry = new THREE.ExtrudeGeometry(hubShape, { depth: thickness + 0.004, bevelEnabled: false, curveSegments: 64 });
       hubGeometry.center();
 
-      const plasticHubMaterial = new THREE.MeshPhysicalMaterial({
+      const plasticHubMaterial = new THREE.MeshStandardMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.35,
-        roughness: 0.1,
-        transmission: 0.9,
-        ior: 1.5
+        opacity: 0.5
       });
 
       const hubMesh = new THREE.Mesh(hubGeometry, plasticHubMaterial);
