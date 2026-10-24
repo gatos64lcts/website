@@ -6,7 +6,7 @@
   <title>MOPHRA RECS — Compact Disc Archive</title>
 
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="favicon.png">
+  <link rel="icon" type="image/x-icon" href="../resources/favicon.ico">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -36,7 +36,7 @@
       font-family: 'Space Mono', monospace;
     }
 
-    /* Film Grain Overlay estilo A24 */
+    /* Film Grain Overlay */
     .grain-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -288,7 +288,7 @@
     }
 
     function setupStudioLighting() {
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
       scene.add(ambientLight);
 
       const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
@@ -305,35 +305,30 @@
     }
 
     function buildDiscsCarousel() {
-      const textureLoader = new THREE.TextureLoader();
-
       const outerRadius = 1.8;
       const innerRadius = 0.28;
-      const hubRadius = 0.55;
-      const thickness = 0.025; // Extrusión delgada para volumen 3D real
+      const thickness = 0.025; // Grosor físico real en 3D
 
+      // 1. Cuerpo base del CD con extrusión delgada para darle volumen lateral
       const shape = new THREE.Shape();
       shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
       const holePath = new THREE.Path();
       holePath.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
       shape.holes.push(holePath);
 
-      const extrudeSettings = {
+      const cdGeometry = new THREE.ExtrudeGeometry(shape, {
         depth: thickness,
         bevelEnabled: true,
-        bevelSegments: 4,
+        bevelSegments: 2,
         steps: 1,
-        bevelSize: 0.008,
-        bevelThickness: 0.004,
-        curveSegments: 128
-      };
-
-      const cdGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        bevelSize: 0.005,
+        bevelThickness: 0.003,
+        curveSegments: 64
+      });
       cdGeometry.center();
 
-      // Material con Reflejos Fotorrealistas e Iridiscencia (Extraído de tu código)
       const cdMetalMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0xdddddd,
+        color: 0xcccccc,
         metalness: 0.95,
         roughness: 0.15,
         clearcoat: 1.0,
@@ -342,19 +337,37 @@
         iridescenceIOR: 1.3
       });
 
+      const textureLoader = new THREE.TextureLoader();
+
       ALBUMS.forEach((album) => {
         const discGroup = new THREE.Group();
 
-        // Material frontal optimizado para mostrar la portada con brillo y reflejos
-        const cdFrontMaterial = new THREE.MeshPhysicalMaterial({
-          metalness: 0.3,
+        // Cuerpo metálico extruido (da el volumen al girar)
+        const cdBodyMesh = new THREE.Mesh(cdGeometry, cdMetalMaterial);
+        discGroup.add(cdBodyMesh);
+
+        // 2. Plano frontal independiente para la carátula (garantiza que la imagen NUNCA falle)
+        const ringGeo = new THREE.RingGeometry(innerRadius, outerRadius, 64, 1);
+        const pos = ringGeo.attributes.position;
+        const uvs = ringGeo.attributes.uv;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const y = pos.getY(i);
+          uvs.setXY(i, (x / outerRadius + 1) / 2, (y / outerRadius + 1) / 2);
+        }
+        ringGeo.attributes.uv.needsUpdate = true;
+
+        const frontArtworkMaterial = new THREE.MeshPhysicalMaterial({
           roughness: 0.2,
+          metalness: 0.1,
           clearcoat: 0.8,
           iridescence: 0.3,
-          iridescenceIOR: 1.3
+          iridescenceIOR: 1.3,
+          side: THREE.FrontSide,
+          transparent: true
         });
 
-        // Cargar imagen de forma segura
+        // Carga de imagen segura con objeto nativo para evitar bloqueos
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = album.customImage;
@@ -363,34 +376,13 @@
           const texture = new THREE.Texture(img);
           texture.colorSpace = THREE.SRGBColorSpace;
           texture.needsUpdate = true;
-          cdFrontMaterial.map = texture;
-          cdFrontMaterial.needsUpdate = true;
+          frontArtworkMaterial.map = texture;
+          frontArtworkMaterial.needsUpdate = true;
         };
 
-        const cdMesh = new THREE.Mesh(cdGeometry, [cdMetalMaterial, cdFrontMaterial]);
-        discGroup.add(cdMesh);
-
-        // Anillo plástico central
-        const hubShape = new THREE.Shape();
-        hubShape.absarc(0, 0, hubRadius, 0, Math.PI * 2, false);
-        const hubHole = new THREE.Path();
-        hubHole.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
-        hubShape.holes.push(hubHole);
-
-        const hubGeometry = new THREE.ExtrudeGeometry(hubShape, { depth: thickness + 0.002, bevelEnabled: false });
-        hubGeometry.center();
-
-        const plasticHubMaterial = new THREE.MeshPhysicalMaterial({
-          color: 0xffffff,
-          transparent: true,
-          opacity: 0.35,
-          roughness: 0.1,
-          transmission: 0.9,
-          ior: 1.5
-        });
-
-        const hubMesh = new THREE.Mesh(hubGeometry, plasticHubMaterial);
-        discGroup.add(hubMesh);
+        const frontMesh = new THREE.Mesh(ringGeo, frontArtworkMaterial);
+        frontMesh.position.z = (thickness / 2) + 0.002; // Superficie frontal exacta
+        discGroup.add(frontMesh);
 
         scene.add(discGroup);
         discMeshes.push(discGroup);
@@ -581,19 +573,17 @@
         discGroup.position.set(posX, Math.sin(time + i * 1.5) * 0.04, posZ);
         discGroup.scale.set(scale, scale, scale);
 
-        const cdMesh = discGroup.children[0];
-
         if (Math.abs(offset) < 0.5) {
-          cdMesh.rotation.x = 0.25 + userRotX;
-          cdMesh.rotation.y = (offset * -0.5) + userRotY;
+          discGroup.rotation.x = 0.25 + userRotX;
+          discGroup.rotation.y = (offset * -0.5) + userRotY;
           if (autoRotate && !isDragging) {
-            cdMesh.rotation.z += 0.008;
+            discGroup.rotation.z += 0.008;
           }
         } else {
-          cdMesh.rotation.x = 0.25;
-          cdMesh.rotation.y = offset * -0.5;
+          discGroup.rotation.x = 0.25;
+          discGroup.rotation.y = offset * -0.5;
           if (autoRotate) {
-            cdMesh.rotation.z += 0.002;
+            discGroup.rotation.z += 0.002;
           }
         }
       });
