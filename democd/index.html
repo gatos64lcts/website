@@ -196,7 +196,7 @@
         cat: "MPH-016",
         genre: "HYBRID TRAP",
         colors: { base: "#18181b", accent: "#ef4444", disc: "#27272a" },
-        customImage: "", // Diseño generado automáticamente si está vacío
+        customImage: "", 
         tracks: [
           "01. voidSTAR (Original Mix) (03:11)",
           "02. voidSTAR (Extended VIP) (04:33)"
@@ -371,6 +371,7 @@
       const hubRadius = 0.55;
       const thickness = 0.03;
 
+      // Geometría limpia del CD completo con 256 segmentos para círculo perfecto
       const shape = new THREE.Shape();
       shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
       const holePath = new THREE.Path();
@@ -384,7 +385,7 @@
         steps: 1,
         bevelSize: 0.015,
         bevelThickness: 0.008,
-        curveSegments: 128
+        curveSegments: 256
       };
 
       const cdGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
@@ -403,11 +404,11 @@
       ALBUMS.forEach((album) => {
         const discGroup = new THREE.Group();
 
-        // 1. Cuerpo base del CD (Metal por los cantos y reverso)
+        // 1. Cuerpo base metálico del CD (cantos y reverso)
         const cdMesh = new THREE.Mesh(cdGeometry, cdMetalMaterial);
         discGroup.add(cdMesh);
 
-        // 2. Carátula Frontal Plana Perfecta (RingGeometry evita deformaciones cilíndricas)
+        // 2. Textura frontal limpia mapeada correctamente sobre el disco
         const imageSource = (album.customImage && album.customImage.trim() !== "") 
           ? album.customImage 
           : createFallbackCanvas(album);
@@ -416,20 +417,18 @@
         artworkTexture.colorSpace = THREE.SRGBColorSpace;
         artworkTexture.center.set(0.5, 0.5);
 
-        const frontGeometry = new THREE.RingGeometry(innerRadius, outerRadius, 128);
         const frontMaterial = new THREE.MeshPhysicalMaterial({
           map: artworkTexture,
           metalness: 0.3,
           roughness: 0.2,
           clearcoat: 1.0,
-          side: THREE.FrontSide
+          roughnessMap: null
         });
 
-        const frontMesh = new THREE.Mesh(frontGeometry, frontMaterial);
-        frontMesh.position.z = (thickness / 2) + 0.002; // Justo sobre la cara frontal del CD
+        const frontMesh = new THREE.Mesh(cdGeometry, [cdMetalMaterial, frontMaterial]);
         discGroup.add(frontMesh);
 
-        // 3. Anillo de plástico central transparente del CD
+        // 3. Anillo central transparente de plástico
         const hubShape = new THREE.Shape();
         hubShape.absarc(0, 0, hubRadius, 0, Math.PI * 2, false);
         const hubHole = new THREE.Path();
@@ -612,19 +611,19 @@
         discGroup.position.set(posX, Math.sin(time + i * 1.5) * 0.04, posZ);
         discGroup.scale.set(scale, scale, scale);
 
-        const cdMesh = discGroup.children[0];
+        const cdMesh = discGroup.children[1]; // Referencia correcta a la malla frontal
 
         if (Math.abs(offset) < 0.5) {
-          cdMesh.rotation.x = 0.25 + userRotationX;
-          cdMesh.rotation.y = (offset * -0.5) + userRotationY;
+          discGroup.rotation.x = 0.25 + userRotationX;
+          discGroup.rotation.y = (offset * -0.5) + userRotationY;
           if (autoRotate && !isDragging) {
-            cdMesh.rotation.z += 0.008;
+            discGroup.rotation.z += 0.008;
           }
         } else {
-          cdMesh.rotation.x = 0.25;
-          cdMesh.rotation.y = offset * -0.5;
+          discGroup.rotation.x = 0.25;
+          discGroup.rotation.y = offset * -0.5;
           if (autoRotate) {
-            cdMesh.rotation.z += 0.002;
+            discGroup.rotation.z += 0.002;
           }
         }
       });
