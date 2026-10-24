@@ -76,13 +76,14 @@
       height: 100vh;
       z-index: 0;
       cursor: grab;
+      background-color: #F5260A !important;
     }
     #canvas-container:active {
       cursor: grabbing;
     }
   </style>
 </head>
-<body class="h-full relative">
+<body class="h-full relative" style="background-color: #F5260A !important;">
 
   <!-- Grain Overlay -->
   <div class="grain-overlay"></div>
@@ -177,7 +178,6 @@
   </main>
 
   <script>
-    // Usamos URLs absolutas directas de Raw GitHub para evitar cualquier bloqueo de ruta o CORS en producción
     const ALBUMS = [
       {
         id: "mylastsound",
@@ -187,7 +187,7 @@
         cat: "MPH-015",
         genre: "BASS HOUSE",
         colors: { base: "#111827", accent: "#38bdf8", disc: "#0f172a" },
-        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/015-my-last-sound.webp",
+        customImage: "../resources/covers/015-my-last-sound.webp",
         releaseUrl: "https://too.fm/baddy-my-last-sound",
         tracks: [
           "01. My Last Sound (03:42)",
@@ -204,7 +204,7 @@
         cat: "MPH-016",
         genre: "HYBRID TRAP",
         colors: { base: "#18181b", accent: "#ef4444", disc: "#27272a" },
-        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/016-voidstar.webp",
+        customImage: "../resources/covers/016-voidstar.webp",
         releaseUrl: "https://too.fm/mophra016-voidstar",
         tracks: [
           "01. voidSTAR (Original Mix) (03:11)",
@@ -219,7 +219,7 @@
         cat: "MPH-014",
         genre: "BASS HOUSE",
         colors: { base: "#172554", accent: "#f59e0b", disc: "#1e3a8a" },
-        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/014-bounce.webp",
+        customImage: "../resources/covers/014-bounce.webp",
         releaseUrl: "https://too.fm/mophra014-bounce",
         tracks: [
           "01. Bounce (Original Mix) (03:22)"
@@ -233,7 +233,7 @@
         cat: "MPH-013",
         genre: "HARD BASS",
         colors: { base: "#064e3b", accent: "#10b981", disc: "#022c22" },
-        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/013-acidrage.webp",
+        customImage: "../resources/covers/013-acidrage.webp",
         releaseUrl: "https://too.fm/acidrage",
         tracks: [
           "01. Acid Rage (03:30)"
@@ -262,8 +262,9 @@
 
       scene = new THREE.Scene();
 
-      camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 0, 7.5);
+      // Cámara corregida para que el disco tenga el tamaño perfecto en pantalla
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 0, 6.5);
 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -315,7 +316,6 @@
       });
       cdGeometry.center();
 
-      // Material metálico básico y limpio para el cuerpo del CD
       const cdMetalMaterial = new THREE.MeshStandardMaterial({
         color: 0xcccccc,
         metalness: 0.9,
@@ -327,11 +327,9 @@
       ALBUMS.forEach((album) => {
         const discGroup = new THREE.Group();
 
-        // 1. Cuerpo base del CD
         const cdBaseMesh = new THREE.Mesh(cdGeometry, cdMetalMaterial);
         discGroup.add(cdBaseMesh);
 
-        // 2. Cara frontal impresa
         const ringGeo = new THREE.RingGeometry(innerRadius, outerRadius, 64, 1);
         const pos = ringGeo.attributes.position;
         const uvs = ringGeo.attributes.uv;
@@ -342,22 +340,22 @@
         }
         ringGeo.attributes.uv.needsUpdate = true;
 
-        // MeshBasicMaterial garantiza que la imagen se vea perfecta sin depender de luces complejas
         const frontArtworkMaterial = new THREE.MeshBasicMaterial({
           side: THREE.FrontSide,
           transparent: true
         });
 
+        // Carga de textura optimizada con soporte sRGB para Three.js r128
         textureLoader.load(
           album.customImage,
           (texture) => {
-            texture.needsUpdate = true;
+            texture.colorSpace = THREE.SRGBColorSpace;
             frontArtworkMaterial.map = texture;
             frontArtworkMaterial.needsUpdate = true;
           },
           undefined,
           (err) => {
-            console.warn("Error cargando textura:", err);
+            console.warn("No se pudo cargar la imagen:", album.customImage, err);
           }
         );
 
@@ -365,7 +363,6 @@
         frontMesh.position.z = (thickness / 2) + 0.003;
         discGroup.add(frontMesh);
 
-        // 3. Anillo plástico central
         const hubShape = new THREE.Shape();
         hubShape.absarc(0, 0, hubRadius, 0, Math.PI * 2, false);
         const hubHole = new THREE.Path();
@@ -568,7 +565,8 @@
         const offset = i - currentScrollProgress;
         const posX = offset * spacing;
         const posZ = -Math.pow(offset, 2) * 1.2;
-        const scale = Math.max(0.4, 1.0 - Math.abs(offset) * 0.45);
+        // Escala normalizada para que no se vean gigantes
+        const scale = Math.max(0.35, 0.9 - Math.abs(offset) * 0.4);
 
         discGroup.position.set(posX, Math.sin(time + i * 1.5) * 0.04, posZ);
         discGroup.scale.set(scale, scale, scale);
