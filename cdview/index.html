@@ -33,7 +33,7 @@
       font-family: 'Space Mono', monospace;
     }
 
-    /* Film Grain Overlay estilo A24 */
+    /* Film Grain Overlay */
     .grain-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -177,7 +177,7 @@
   </main>
 
   <script>
-    // RUTAS CORREGIDAS SEGÚN TU REPOSOTORIO (cdview -> resources/covers)
+    // Usamos URLs absolutas directas de Raw GitHub para evitar cualquier bloqueo de ruta o CORS en producción
     const ALBUMS = [
       {
         id: "mylastsound",
@@ -187,8 +187,7 @@
         cat: "MPH-015",
         genre: "BASS HOUSE",
         colors: { base: "#111827", accent: "#38bdf8", disc: "#0f172a" },
-        // Usamos la URL raw de GitHub para evitar bloqueos de ruta
-        customImage: "../resources/covers/015-my-last-sound.webp",
+        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/015-my-last-sound.webp",
         releaseUrl: "https://too.fm/baddy-my-last-sound",
         tracks: [
           "01. My Last Sound (03:42)",
@@ -205,7 +204,7 @@
         cat: "MPH-016",
         genre: "HYBRID TRAP",
         colors: { base: "#18181b", accent: "#ef4444", disc: "#27272a" },
-        customImage: "../resources/covers/016-voidstar.webp",
+        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/016-voidstar.webp",
         releaseUrl: "https://too.fm/mophra016-voidstar",
         tracks: [
           "01. voidSTAR (Original Mix) (03:11)",
@@ -220,7 +219,7 @@
         cat: "MPH-014",
         genre: "BASS HOUSE",
         colors: { base: "#172554", accent: "#f59e0b", disc: "#1e3a8a" },
-        customImage: "../resources/covers/014-bounce.webp",
+        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/014-bounce.webp",
         releaseUrl: "https://too.fm/mophra014-bounce",
         tracks: [
           "01. Bounce (Original Mix) (03:22)"
@@ -234,7 +233,7 @@
         cat: "MPH-013",
         genre: "HARD BASS",
         colors: { base: "#064e3b", accent: "#10b981", disc: "#022c22" },
-        customImage: "../resources/covers/013-acidrage.webp",
+        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/013-acidrage.webp",
         releaseUrl: "https://too.fm/acidrage",
         tracks: [
           "01. Acid Rage (03:30)"
@@ -287,23 +286,15 @@
     }
 
     function setupStudioLighting() {
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
       scene.add(ambientLight);
 
-      const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
+      const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
       keyLight.position.set(5, 5, 4);
       scene.add(keyLight);
-
-      const rimLight1 = new THREE.PointLight(0x38bdf8, 3, 12);
-      rimLight1.position.set(-4, 3, -2);
-      scene.add(rimLight1);
-
-      const rimLight2 = new THREE.PointLight(0xc084fc, 2.5, 12);
-      rimLight2.position.set(4, -3, -2);
-      scene.add(rimLight2);
     }
 
-function buildDiscsCarousel() {
+    function buildDiscsCarousel() {
       const outerRadius = 1.8;
       const innerRadius = 0.28;
       const hubRadius = 0.55;
@@ -318,24 +309,20 @@ function buildDiscsCarousel() {
       const cdGeometry = new THREE.ExtrudeGeometry(shape, {
         depth: thickness,
         bevelEnabled: true,
-        bevelSegments: 4,
+        bevelSegments: 2,
         steps: 1,
-        bevelSize: 0.01,
-        bevelThickness: 0.005,
-        curveSegments: 128
+        curveSegments: 64
       });
       cdGeometry.center();
 
-      // Reverso metálico holográfico
-      const cdMetalMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0xdddddd,
-        metalness: 0.95,
-        roughness: 0.15,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.05,
-        iridescence: 0.9,
-        iridescenceIOR: 1.3
+      // Material metálico básico y limpio para el cuerpo del CD
+      const cdMetalMaterial = new THREE.MeshStandardMaterial({
+        color: 0xcccccc,
+        metalness: 0.9,
+        roughness: 0.2
       });
+
+      const textureLoader = new THREE.TextureLoader();
 
       ALBUMS.forEach((album) => {
         const discGroup = new THREE.Group();
@@ -344,8 +331,8 @@ function buildDiscsCarousel() {
         const cdBaseMesh = new THREE.Mesh(cdGeometry, cdMetalMaterial);
         discGroup.add(cdBaseMesh);
 
-        // 2. Cara frontal impresa usando HTML Image para evitar bloqueo CORS
-        const ringGeo = new THREE.RingGeometry(innerRadius, outerRadius, 128, 1);
+        // 2. Cara frontal impresa
+        const ringGeo = new THREE.RingGeometry(innerRadius, outerRadius, 64, 1);
         const pos = ringGeo.attributes.position;
         const uvs = ringGeo.attributes.uv;
         for (let i = 0; i < pos.count; i++) {
@@ -355,33 +342,24 @@ function buildDiscsCarousel() {
         }
         ringGeo.attributes.uv.needsUpdate = true;
 
+        // MeshBasicMaterial garantiza que la imagen se vea perfecta sin depender de luces complejas
         const frontArtworkMaterial = new THREE.MeshBasicMaterial({
           side: THREE.FrontSide,
           transparent: true
         });
 
-        // Crear objeto de imagen estándar de HTML
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        
-        // Aquí puedes usar tu ruta relativa original de GitHub tranquilamente
-        img.src = album.customImage; 
-
-        img.onload = () => {
-          const texture = new THREE.Texture(img);
-          texture.encoding = THREE.sRGBEncoding;
-          texture.needsUpdate = true;
-          frontArtworkMaterial.map = texture;
-          frontArtworkMaterial.needsUpdate = true;
-        };
-
-        // En caso de que falle la carga por ruta, usamos el respaldo gráfico dinámico
-        img.onerror = () => {
-          const fallbackTex = new THREE.TextureLoader().load(createFallbackCanvas(album));
-          fallbackTex.encoding = THREE.sRGBEncoding;
-          frontArtworkMaterial.map = fallbackTex;
-          frontArtworkMaterial.needsUpdate = true;
-        };
+        textureLoader.load(
+          album.customImage,
+          (texture) => {
+            texture.needsUpdate = true;
+            frontArtworkMaterial.map = texture;
+            frontArtworkMaterial.needsUpdate = true;
+          },
+          undefined,
+          (err) => {
+            console.warn("Error cargando textura:", err);
+          }
+        );
 
         const frontMesh = new THREE.Mesh(ringGeo, frontArtworkMaterial);
         frontMesh.position.z = (thickness / 2) + 0.003;
@@ -394,16 +372,13 @@ function buildDiscsCarousel() {
         hubHole.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
         hubShape.holes.push(hubHole);
 
-        const hubGeometry = new THREE.ExtrudeGeometry(hubShape, { depth: thickness + 0.004, bevelEnabled: false, curveSegments: 64 });
+        const hubGeometry = new THREE.ExtrudeGeometry(hubShape, { depth: thickness + 0.004, bevelEnabled: false, curveSegments: 32 });
         hubGeometry.center();
 
-        const plasticHubMaterial = new THREE.MeshPhysicalMaterial({
+        const plasticHubMaterial = new THREE.MeshStandardMaterial({
           color: 0xffffff,
           transparent: true,
-          opacity: 0.35,
-          roughness: 0.1,
-          transmission: 0.9,
-          ior: 1.5
+          opacity: 0.5
         });
 
         const hubMesh = new THREE.Mesh(hubGeometry, plasticHubMaterial);
