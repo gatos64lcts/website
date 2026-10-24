@@ -188,7 +188,7 @@
         genre: "BASS HOUSE",
         colors: { base: "#111827", accent: "#38bdf8", disc: "#0f172a" },
         // Usamos la URL raw de GitHub para evitar bloqueos de ruta
-        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/015-my-last-sound.webp",
+        customImage: "../resources/covers/015-my-last-sound.webp",
         releaseUrl: "https://too.fm/baddy-my-last-sound",
         tracks: [
           "01. My Last Sound (03:42)",
@@ -205,7 +205,7 @@
         cat: "MPH-016",
         genre: "HYBRID TRAP",
         colors: { base: "#18181b", accent: "#ef4444", disc: "#27272a" },
-        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/016-voidstar.webp",
+        customImage: "../resources/covers/016-voidstar.webp",
         releaseUrl: "https://too.fm/mophra016-voidstar",
         tracks: [
           "01. voidSTAR (Original Mix) (03:11)",
@@ -220,7 +220,7 @@
         cat: "MPH-014",
         genre: "BASS HOUSE",
         colors: { base: "#172554", accent: "#f59e0b", disc: "#1e3a8a" },
-        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/014-bounce.webp",
+        customImage: "../resources/covers/014-bounce.webp",
         releaseUrl: "https://too.fm/mophra014-bounce",
         tracks: [
           "01. Bounce (Original Mix) (03:22)"
@@ -234,7 +234,7 @@
         cat: "MPH-013",
         genre: "HARD BASS",
         colors: { base: "#064e3b", accent: "#10b981", disc: "#022c22" },
-        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/013-acidrage.webp",
+        customImage: "../resources/covers/013-acidrage.webp",
         releaseUrl: "https://too.fm/acidrage",
         tracks: [
           "01. Acid Rage (03:30)"
@@ -303,8 +303,7 @@
       scene.add(rimLight2);
     }
 
-    function buildDiscsCarousel() {
-      const textureLoader = new THREE.TextureLoader();
+function buildDiscsCarousel() {
       const outerRadius = 1.8;
       const innerRadius = 0.28;
       const hubRadius = 0.55;
@@ -345,7 +344,7 @@
         const cdBaseMesh = new THREE.Mesh(cdGeometry, cdMetalMaterial);
         discGroup.add(cdBaseMesh);
 
-        // 2. Cara frontal impresa
+        // 2. Cara frontal impresa usando HTML Image para evitar bloqueo CORS
         const ringGeo = new THREE.RingGeometry(innerRadius, outerRadius, 128, 1);
         const pos = ringGeo.attributes.position;
         const uvs = ringGeo.attributes.uv;
@@ -357,21 +356,35 @@
         ringGeo.attributes.uv.needsUpdate = true;
 
         const frontArtworkMaterial = new THREE.MeshBasicMaterial({
-          side: THREE.FrontSide, // Renderizado frontal directo
+          side: THREE.FrontSide,
           transparent: true
         });
 
-        textureLoader.load(
-          album.customImage,
-          (texture) => {
-            texture.encoding = THREE.sRGBEncoding;
-            frontArtworkMaterial.map = texture;
-            frontArtworkMaterial.needsUpdate = true;
-          }
-        );
+        // Crear objeto de imagen estándar de HTML
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        
+        // Aquí puedes usar tu ruta relativa original de GitHub tranquilamente
+        img.src = album.customImage; 
+
+        img.onload = () => {
+          const texture = new THREE.Texture(img);
+          texture.encoding = THREE.sRGBEncoding;
+          texture.needsUpdate = true;
+          frontArtworkMaterial.map = texture;
+          frontArtworkMaterial.needsUpdate = true;
+        };
+
+        // En caso de que falle la carga por ruta, usamos el respaldo gráfico dinámico
+        img.onerror = () => {
+          const fallbackTex = new THREE.TextureLoader().load(createFallbackCanvas(album));
+          fallbackTex.encoding = THREE.sRGBEncoding;
+          frontArtworkMaterial.map = fallbackTex;
+          frontArtworkMaterial.needsUpdate = true;
+        };
 
         const frontMesh = new THREE.Mesh(ringGeo, frontArtworkMaterial);
-        frontMesh.position.z = (thickness / 2) + 0.003; // Evita superposición
+        frontMesh.position.z = (thickness / 2) + 0.003;
         discGroup.add(frontMesh);
 
         // 3. Anillo plástico central
