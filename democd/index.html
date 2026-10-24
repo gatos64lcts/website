@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MOPHRA RECS — Compact Disc Archive</title>
+  <title>MOPHRA — Compact Disc Archive</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -163,7 +163,7 @@
         cat: "MPH-015",
         genre: "BASS HOUSE",
         colors: { base: "#111827", accent: "#38bdf8", disc: "#0f172a" },
-        customImage: "resources/covers/015-my-last-sound.webp", // Ruta exacta de tu imagen
+        customImage: "../resources/covers/015-my-last-sound.webp", // Ruta de tu imagen
         tracks: [
           "01. My Last Sound (03:42)",
           "02. CHOKE (04:15)",
@@ -348,7 +348,7 @@
       const hubRadius = 0.55;
       const thickness = 0.03;
 
-      // 1. Cuerpo base del CD (Metálico holográfico por detrás y bordes)
+      // 1. Cuerpo base del CD (Metal holográfico)
       const shape = new THREE.Shape();
       shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
       const holePath = new THREE.Path();
@@ -381,18 +381,13 @@
       const cdBaseMesh = new THREE.Mesh(cdGeometry, cdMetalMaterial);
       cdMeshGroup.add(cdBaseMesh);
 
-      // 2. Carátula Frontal con Coordenadas UV Circulares Perfectas
+      // 2. Carga segura de textura con respaldo (Fallback automático)
       const textureLoader = new THREE.TextureLoader();
       const imageSource = (album.customImage && album.customImage.trim() !== "") 
         ? album.customImage 
         : createCDArtworkCanvas(album);
 
-      const artworkTexture = textureLoader.load(imageSource);
-      artworkTexture.colorSpace = THREE.SRGBColorSpace;
-
       const ringGeo = new THREE.RingGeometry(innerRadius, outerRadius, 128, 1);
-
-      // Generador de UVs para proyectar la imagen cuadrada sobre el anillo plano sin distorsión
       const pos = ringGeo.attributes.position;
       const uvs = ringGeo.attributes.uv;
       for (let i = 0; i < pos.count; i++) {
@@ -404,19 +399,37 @@
       }
       ringGeo.attributes.uv.needsUpdate = true;
 
+      // Material inicial provisional en lo que carga la imagen
       const frontArtworkMaterial = new THREE.MeshPhysicalMaterial({
-        map: artworkTexture,
         metalness: 0.2,
         roughness: 0.25,
         clearcoat: 1.0,
         side: THREE.DoubleSide
       });
 
+      textureLoader.load(
+        imageSource,
+        (texture) => {
+          texture.colorSpace = THREE.SRGBColorSpace;
+          frontArtworkMaterial.map = texture;
+          frontArtworkMaterial.needsUpdate = true;
+        },
+        undefined,
+        (err) => {
+          console.warn("No se pudo cargar la imagen personalizada, usando diseño por código:", err);
+          // Si falla la ruta, genera el canvas de respaldo automáticamente
+          const fallbackTex = textureLoader.load(createCDArtworkCanvas(album));
+          fallbackTex.colorSpace = THREE.SRGBColorSpace;
+          frontArtworkMaterial.map = fallbackTex;
+          frontArtworkMaterial.needsUpdate = true;
+        }
+      );
+
       const frontMesh = new THREE.Mesh(ringGeo, frontArtworkMaterial);
-      frontMesh.position.z = (thickness / 2) + 0.002; // Posicionado ligeramente sobre la cara frontal
+      frontMesh.position.z = (thickness / 2) + 0.002;
       cdMeshGroup.add(frontMesh);
 
-      // 3. Anillo de plástico transparente central
+      // 3. Anillo plástico central
       const hubShape = new THREE.Shape();
       hubShape.absarc(0, 0, hubRadius, 0, Math.PI * 2, false);
       const hubHole = new THREE.Path();
