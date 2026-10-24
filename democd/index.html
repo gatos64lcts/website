@@ -8,7 +8,7 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Three.js Library -->
+  <!-- Three.js Library r128 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <!-- Google Fonts: Inter & Space Mono -->
@@ -163,7 +163,7 @@
         cat: "MPH-015",
         genre: "BASS HOUSE",
         colors: { base: "#111827", accent: "#38bdf8", disc: "#0f172a" },
-        customImage: "../resources/covers/015-my-last-sound.webp", // Ruta desde /democd/
+        customImage: "../resources/covers/015-my-last-sound.webp", // Ruta correcta desde /democd/
         tracks: [
           "01. My Last Sound (03:42)",
           "02. CHOKE (04:15)",
@@ -381,7 +381,7 @@
       const cdBaseMesh = new THREE.Mesh(cdGeometry, cdMetalMaterial);
       cdMeshGroup.add(cdBaseMesh);
 
-      // 2. Malla frontal con protección ante errores de ruta
+      // 2. Malla frontal con codificación compatible r128 (THREE.sRGBEncoding)
       const textureLoader = new THREE.TextureLoader();
       const ringGeo = new THREE.RingGeometry(innerRadius, outerRadius, 128, 1);
       const pos = ringGeo.attributes.position;
@@ -406,7 +406,7 @@
         textureLoader.load(
           url,
           (texture) => {
-            texture.colorSpace = THREE.SRGBColorSpace;
+            texture.encoding = THREE.sRGBEncoding; // Corrección crítica para r128
             frontArtworkMaterial.map = texture;
             frontArtworkMaterial.needsUpdate = true;
           },
@@ -414,7 +414,7 @@
           (err) => {
             console.warn("No se cargó la imagen de la ruta, usando diseño alternativo de respaldo:", err);
             const fallbackTex = textureLoader.load(createFallbackCanvas(album));
-            fallbackTex.colorSpace = THREE.SRGBColorSpace;
+            fallbackTex.encoding = THREE.sRGBEncoding;
             frontArtworkMaterial.map = fallbackTex;
             frontArtworkMaterial.needsUpdate = true;
           }
@@ -425,7 +425,7 @@
         applyTextureSafely(album.customImage);
       } else {
         const fallbackTex = textureLoader.load(createFallbackCanvas(album));
-        fallbackTex.colorSpace = THREE.SRGBColorSpace;
+        fallbackTex.encoding = THREE.sRGBEncoding;
         frontArtworkMaterial.map = fallbackTex;
         frontArtworkMaterial.needsUpdate = true;
       }
