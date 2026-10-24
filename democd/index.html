@@ -170,7 +170,8 @@
 
   <!-- Three.js App Script -->
   <script>
-    // --- 4 DISCOS DE PRUEBA (Aquí puedes agregar más o cambiar tus imágenes) ---
+    // --- 4 DISCOS DE PRUEBA ---
+    // Coloca la ruta de tu imagen en 'customImage' (ej. "resources/cortina-000000.webp")
     const ALBUMS = [
       {
         id: "mylastsound",
@@ -180,7 +181,7 @@
         cat: "MPH-015",
         genre: "BASS HOUSE",
         colors: { base: "#111827", accent: "#38bdf8", disc: "#0f172a" },
-        customImage: "resources/cortina-000000.webp", // <--- Pon tu ruta de imagen aquí (ej. "img/baddy.jpg") o déjalo vacio para diseño automático
+        customImage: "resources/cortina-000000.webp", // Imagen frontal aplicada
         tracks: [
           "01. My Last Sound (03:42)",
           "02. CHOKE (04:15)",
@@ -196,7 +197,7 @@
         cat: "MPH-016",
         genre: "HYBRID TRAP",
         colors: { base: "#18181b", accent: "#ef4444", disc: "#27272a" },
-        customImage: "", // <--- Pon tu segunda imagen aquí
+        customImage: "", // Déjalo vacío si deseas que genere diseño automático por código
         tracks: [
           "01. voidSTAR (Original Mix) (03:11)",
           "02. voidSTAR (Extended VIP) (04:33)"
@@ -210,7 +211,7 @@
         cat: "MPH-017",
         genre: "Y2K HARDWARE BASS",
         colors: { base: "#172554", accent: "#f59e0b", disc: "#1e3a8a" },
-        customImage: "", // <--- Pon tu tercera imagen aquí
+        customImage: "",
         tracks: [
           "01. Drive Initialize (02:50)",
           "02. Data Burst (03:45)",
@@ -225,7 +226,7 @@
         cat: "MPH-018",
         genre: "UNDERGROUND BASS",
         colors: { base: "#064e3b", accent: "#10b981", disc: "#022c22" },
-        customImage: "", // <--- Pon tu cuarta imagen aquí
+        customImage: "",
         tracks: [
           "01. Overdrive (03:30)",
           "02. Cyberpunk Synth (04:02)",
@@ -234,13 +235,7 @@
       }
     ];
 
-    function createCDArtworkCanvas(album) {
-      // Si especificas una customImage, la carga directamente como textura de imagen
-      if (album.customImage && album.customImage.trim() !== "") {
-        return album.customImage;
-      }
-
-      // Si no hay imagen colocada, genera la textura artística automáticamente por código
+    function createFallbackCanvas(album) {
       const canvas = document.createElement('canvas');
       canvas.width = 1024;
       canvas.height = 1024;
@@ -396,6 +391,7 @@
       const cdGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
       cdGeometry.center();
 
+      // Material metálico plateado para reverso y cantos del CD
       const cdMetalMaterial = new THREE.MeshPhysicalMaterial({
         color: 0xdddddd,
         metalness: 0.95,
@@ -409,22 +405,34 @@
       ALBUMS.forEach((album) => {
         const discGroup = new THREE.Group();
 
-        const artSource = createCDArtworkCanvas(album);
-        const artworkTexture = textureLoader.load(artSource);
-        artworkTexture.center.set(0.5, 0.5);
-
-        const cdFrontMaterial = new THREE.MeshPhysicalMaterial({
-          map: artworkTexture,
-          metalness: 0.6,
-          roughness: 0.2,
-          clearcoat: 0.8,
-          iridescence: 0.5,
-          iridescenceIOR: 1.3
-        });
-
-        const cdMesh = new THREE.Mesh(cdGeometry, [cdMetalMaterial, cdFrontMaterial]);
+        // 1. Cuerpo base del CD (Metal por los cantos y reverso)
+        const cdMesh = new THREE.Mesh(cdGeometry, cdMetalMaterial);
         discGroup.add(cdMesh);
 
+        // 2. Imagen frontal exclusiva (si customImage tiene ruta, va solo al frente)
+        const imageSource = (album.customImage && album.customImage.trim() !== "") 
+          ? album.customImage 
+          : createFallbackCanvas(album);
+
+        const artworkTexture = textureLoader.load(imageSource);
+        artworkTexture.colorSpace = THREE.SRGBColorSpace;
+        artworkTexture.center.set(0.5, 0.5);
+
+        const frontGeometry = new THREE.CylinderGeometry(outerRadius, outerRadius, 0.032, 128);
+        const frontMaterial = new THREE.MeshPhysicalMaterial({
+          map: artworkTexture,
+          metalness: 0.4,
+          roughness: 0.2,
+          clearcoat: 1.0,
+          side: THREE.FrontSide // Se muestra únicamente en el frente
+        });
+
+        const frontMesh = new THREE.Mesh(frontGeometry, frontMaterial);
+        frontMesh.rotation.x = Math.PI / 2;
+        frontMesh.position.z = 0.002;
+        discGroup.add(frontMesh);
+
+        // 3. Anillo de plástico central transparente del CD
         const hubShape = new THREE.Shape();
         hubShape.absarc(0, 0, hubRadius, 0, Math.PI * 2, false);
         const hubHole = new THREE.Path();
