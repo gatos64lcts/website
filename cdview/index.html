@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MOPHRA disk — Compact Disc Archive</title>
+  <title>MOPHRA RECS — Compact Disc Archive</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -179,7 +179,7 @@
         year: "2026",
         cat: "MPH-015",
         genre: "BASS HOUSE",
-        customImage: "/resources/covers/015-my-last-sound.webp",
+        customImage: "../resources/covers/015-my-last-sound.webp",
         releaseUrl: "https://too.fm/baddy-my-last-sound",
         tracks: [
           "01. My Last Sound (03:42)",
@@ -195,7 +195,7 @@
         year: "2026",
         cat: "MPH-016",
         genre: "HYBRID TRAP",
-        customImage: "/resources/covers/016-voidstar.webp",
+        customImage: "../resources/covers/016-voidstar.webp",
         releaseUrl: "https://too.fm/mophra016-voidstar",
         tracks: [
           "01. voidSTAR (Original Mix) (03:11)",
@@ -209,7 +209,7 @@
         year: "2026",
         cat: "MPH-014",
         genre: "BASS HOUSE",
-        customImage: "/resources/covers/014-bounce.webp",
+        customImage: "../resources/covers/014-bounce.webp",
         releaseUrl: "https://too.fm/mophra014-bounce",
         tracks: [
           "01. Bounce (Original Mix) (03:22)"
@@ -222,7 +222,7 @@
         year: "2026",
         cat: "MPH-013",
         genre: "HARD BASS",
-        customImage: "/resources/covers/013-acidrage.webp",
+        customImage: "../resources/covers/013-acidrage.webp",
         releaseUrl: "https://too.fm/acidrage",
         tracks: [
           "01. Acid Rage (03:30)"
@@ -251,9 +251,9 @@
 
       scene = new THREE.Scene();
 
-      // Ajuste de cámara alejada para encuadrar perfectamente
-      camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 0, 9);
+      // Cámara ajustada para ver los CDs planos y limpios en proporción correcta
+      camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 0, 5.2);
 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -276,100 +276,43 @@
     }
 
     function setupStudioLighting() {
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
       scene.add(ambientLight);
-
-      const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
-      keyLight.position.set(5, 5, 4);
-      scene.add(keyLight);
     }
 
     function buildDiscsCarousel() {
       const outerRadius = 1.8;
-      const innerRadius = 0.28;
-      const hubRadius = 0.55;
-      const thickness = 0.03;
+      const innerRadius = 0.32; // Agujero central clásico de CD
 
-      const shape = new THREE.Shape();
-      shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
-      const holePath = new THREE.Path();
-      holePath.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
-      shape.holes.push(holePath);
-
-      const cdGeometry = new THREE.ExtrudeGeometry(shape, {
-        depth: thickness,
-        bevelEnabled: true,
-        bevelSegments: 2,
-        steps: 1,
-        curveSegments: 64
-      });
-      cdGeometry.center();
-
-      const cdMetalMaterial = new THREE.MeshStandardMaterial({
-        color: 0xcccccc,
-        metalness: 0.85,
-        roughness: 0.2
-      });
-
+      // Usamos RingGeometry con un agujero central exactamente como un CD real plano
+      const cdGeometry = new THREE.RingGeometry(innerRadius, outerRadius, 64);
+      
       const textureLoader = new THREE.TextureLoader();
 
       ALBUMS.forEach((album) => {
         const discGroup = new THREE.Group();
 
-        // Base del CD
-        const cdBaseMesh = new THREE.Mesh(cdGeometry, cdMetalMaterial);
-        discGroup.add(cdBaseMesh);
-
-        // Portada
-        const ringGeo = new THREE.RingGeometry(innerRadius, outerRadius, 64, 1);
-        const pos = ringGeo.attributes.position;
-        const uvs = ringGeo.attributes.uv;
-        for (let i = 0; i < pos.count; i++) {
-          const x = pos.getX(i);
-          const y = pos.getY(i);
-          uvs.setXY(i, (x / outerRadius + 1) / 2, (y / outerRadius + 1) / 2);
-        }
-        ringGeo.attributes.uv.needsUpdate = true;
-
-        const frontArtworkMaterial = new THREE.MeshBasicMaterial({
-          side: THREE.FrontSide,
+        const cdMaterial = new THREE.MeshBasicMaterial({
+          side: THREE.DoubleSide,
           transparent: true
         });
 
+        // Cargar la imagen directamente como textura plana del CD
         textureLoader.load(
           album.customImage,
           (texture) => {
-            frontArtworkMaterial.map = texture;
-            frontArtworkMaterial.needsUpdate = true;
+            texture.colorSpace = THREE.SRGBColorSpace;
+            cdMaterial.map = texture;
+            cdMaterial.needsUpdate = true;
           },
           undefined,
           (err) => {
-            console.warn("Ruta de imagen no encontrada:", album.customImage);
+            console.warn("No se pudo cargar la imagen:", album.customImage);
           }
         );
 
-        const frontMesh = new THREE.Mesh(ringGeo, frontArtworkMaterial);
-        frontMesh.position.z = (thickness / 2) + 0.003;
-        discGroup.add(frontMesh);
-
-        // Centro del CD
-        const hubShape = new THREE.Shape();
-        hubShape.absarc(0, 0, hubRadius, 0, Math.PI * 2, false);
-        const hubHole = new THREE.Path();
-        hubHole.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
-        hubShape.holes.push(hubHole);
-
-        const hubGeometry = new THREE.ExtrudeGeometry(hubShape, { depth: thickness + 0.004, bevelEnabled: false, curveSegments: 32 });
-        hubGeometry.center();
-
-        const plasticHubMaterial = new THREE.MeshStandardMaterial({
-          color: 0xffffff,
-          transparent: true,
-          opacity: 0.4
-        });
-
-        const hubMesh = new THREE.Mesh(hubGeometry, plasticHubMaterial);
-        discGroup.add(hubMesh);
+        const cdMesh = new THREE.Mesh(cdGeometry, cdMaterial);
+        discGroup.add(cdMesh);
 
         scene.add(discGroup);
         discMeshes.push(discGroup);
@@ -548,29 +491,29 @@
       userRotX += (targetUserRotX - userRotX) * 0.08;
       userRotY += (targetUserRotY - userRotY) * 0.08;
 
-      const spacing = 3.2;
+      const spacing = 2.6;
       const time = Date.now() * 0.001;
 
       discMeshes.forEach((discGroup, i) => {
         const offset = i - currentScrollProgress;
         const posX = offset * spacing;
-        const posZ = -Math.pow(offset, 2) * 1.5;
+        const posZ = -Math.pow(offset, 2) * 1.2;
         
-        // ESCALA CONTROLADA: El disco central se escala a 0.45 máximo
-        const scale = Math.max(0.2, 0.45 - Math.abs(offset) * 0.2);
+        // Escala idéntica a la referencia limpia estilo A24
+        const scale = Math.max(0.35, 0.85 - Math.abs(offset) * 0.35);
 
-        discGroup.position.set(posX, Math.sin(time + i * 1.5) * 0.04, posZ);
+        discGroup.position.set(posX, Math.sin(time + i * 1.5) * 0.03, posZ);
         discGroup.scale.set(scale, scale, scale);
 
         if (Math.abs(offset) < 0.5) {
-          discGroup.rotation.x = 0.2 + userRotX;
-          discGroup.rotation.y = (offset * -0.5) + userRotY;
+          discGroup.rotation.x = userRotX;
+          discGroup.rotation.y = userRotY;
           if (autoRotate && !isDragging) {
             discGroup.rotation.z += 0.005;
           }
         } else {
-          discGroup.rotation.x = 0.2;
-          discGroup.rotation.y = offset * -0.5;
+          discGroup.rotation.x = 0;
+          discGroup.rotation.y = offset * -0.4;
           discGroup.rotation.z += 0.001;
         }
       });
