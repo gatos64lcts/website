@@ -187,7 +187,8 @@
         cat: "MPH-015",
         genre: "BASS HOUSE",
         colors: { base: "#111827", accent: "#38bdf8", disc: "#0f172a" },
-        customImage: "../resources/covers/015-my-last-sound.webp", // Sube un nivel desde /cdview/
+        // Usamos la URL raw de GitHub para evitar bloqueos de ruta
+        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/015-my-last-sound.webp",
         releaseUrl: "https://too.fm/baddy-my-last-sound",
         tracks: [
           "01. My Last Sound (03:42)",
@@ -204,7 +205,7 @@
         cat: "MPH-016",
         genre: "HYBRID TRAP",
         colors: { base: "#18181b", accent: "#ef4444", disc: "#27272a" },
-        customImage: "../resources/covers/016-voidstar.webp",
+        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/016-voidstar.webp",
         releaseUrl: "https://too.fm/mophra016-voidstar",
         tracks: [
           "01. voidSTAR (Original Mix) (03:11)",
@@ -219,7 +220,7 @@
         cat: "MPH-014",
         genre: "BASS HOUSE",
         colors: { base: "#172554", accent: "#f59e0b", disc: "#1e3a8a" },
-        customImage: "../resources/covers/014-bounce.webp",
+        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/014-bounce.webp",
         releaseUrl: "https://too.fm/mophra014-bounce",
         tracks: [
           "01. Bounce (Original Mix) (03:22)"
@@ -233,14 +234,14 @@
         cat: "MPH-013",
         genre: "HARD BASS",
         colors: { base: "#064e3b", accent: "#10b981", disc: "#022c22" },
-        customImage: "../resources/covers/013-acidrage.webp",
+        customImage: "https://raw.githubusercontent.com/gatos64lcts/website/main/resources/covers/013-acidrage.webp",
         releaseUrl: "https://too.fm/acidrage",
         tracks: [
           "01. Acid Rage (03:30)"
         ]
       }
     ];
-
+    
     let scene, camera, renderer;
     let discMeshes = [];
     let autoRotate = true;
