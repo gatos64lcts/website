@@ -36,12 +36,28 @@
    html, body, #wrapper, #main, .container {
       margin: 0;
       padding: 0;
-      background-color: #F5260A; /* background red */
+      background-color: transparent !important;
       font-family: 'RelicusMono', monospace;
       min-height: 100vh;
       overflow-x: hidden !important;
       max-width: 100vw !important;
       box-sizing: border-box;
+    }
+
+    /* 🌊 CONTENEDOR DEL FONDO ANIMADO DITHER OPTIMIZADO */
+    #dither-background-container {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -10;
+      pointer-events: none;
+      background-color: #f00909;
+    }
+    #dither-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     /* 🖍️ PERSONALIZAR COLOR DE SELECCIÓN / RESALTADOR */
@@ -376,7 +392,12 @@
 </head>
 <body>
 
-  <!-- 🌍 MENÚ FLOTANTE DE REDES SOCIALES (AHORA A LA DERECHA) -->
+  <!-- 🌊 FONDO ANIMADO DITHER (ACTUALIZADO CON NUEVOS PARÁMETROS) -->
+  <div id="dither-background-container">
+    <canvas id="dither-canvas" aria-hidden="true"></canvas>
+  </div>
+
+  <!-- 🌍 MENÚ FLOTANTE DE REDES SOCIALES (DERECHA) -->
   <div class="clean-social-menu" id="socialMenu">
     <button class="menu-trigger-btn" id="menuTrigger" aria-label="Redes Sociales">
       <svg class="world-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -387,37 +408,30 @@
     </button>
 
     <div class="menu-dropdown-box" id="menuDropdown">
-      <!-- 1. Facebook -->
       <a href="https://www.facebook.com/mophrarecs" target="_blank" class="menu-link-item">
         <span class="typewriter-text" style="--ch: 8;">Facebook</span>
         <span class="dot-indicator"></span>
       </a>
-      <!-- 2. Instagram -->
       <a href="https://www.instagram.com/mophrarecs" target="_blank" class="menu-link-item">
         <span class="typewriter-text" style="--ch: 9;">Instagram</span>
         <span class="dot-indicator"></span>
       </a>
-      <!-- 3. SoundCloud -->
       <a href="https://soundcloud.com/mophrarecs" target="_blank" class="menu-link-item">
         <span class="typewriter-text" style="--ch: 10;">SoundCloud</span>
         <span class="dot-indicator"></span>
       </a>
-      <!-- 4. Spotify -->
       <a href="https://open.spotify.com/user/31c5asr7apzu642jpd24ngjwtxjy" target="_blank" class="menu-link-item">
         <span class="typewriter-text" style="--ch: 7;">Spotify</span>
         <span class="dot-indicator"></span>
       </a>
-      <!-- 5. TikTok -->
       <a href="https://www.tiktok.com/@mophrarecs" target="_blank" class="menu-link-item">
         <span class="typewriter-text" style="--ch: 6;">TikTok</span>
         <span class="dot-indicator"></span>
       </a>
-      <!-- 6. Twitter / X -->
       <a href="https://x.com/mophrarecs" target="_blank" class="menu-link-item">
         <span class="typewriter-text" style="--ch: 11;">Twitter / X</span>
         <span class="dot-indicator"></span>
       </a>
-      <!-- 7. Youtube -->
       <a href="https://www.youtube.com/@mophrarecs" target="_blank" class="menu-link-item">
         <span class="typewriter-text" style="--ch: 7;">Youtube</span>
         <span class="dot-indicator"></span>
@@ -425,7 +439,7 @@
     </div>
   </div>
 
-  <!-- 🧭 MENÚ PRINCIPAL MOPHRA (AHORA A LA IZQUIERDA) -->
+  <!-- 🧭 MENÚ PRINCIPAL MOPHRA (IZQUIERDA) -->
   <div class="mophra-global-container" id="mophraGlobalMenu">
     <div class="mophra-global-overlay"></div>
 
@@ -462,29 +476,248 @@
     </nav>
   </div>
 
-  <!-- 🚀 SCRIPT INTEGRADO: VISOR 3D EXACTO + MENÚS MOPHRA -->
+  <!-- 🚀 SCRIPT INTEGRADO: MOTOR DITHER + VISOR 3D + MENÚS -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
 
   <script>
-    window.addEventListener('load', () => {
-      // 1. Creamos el elemento model-viewer dinámicamente con tu código exacto
-      const mv = document.createElement('model-viewer');
+    // --- MOTOR DITHER WEBGL (CONFIGURACIÓN ACTUALIZADA: scale=2.75, contrast=1.25, brightness=-0.17, colorNum=3) ---
+    (function initDitherBackground() {
+      const canvas = document.getElementById('dither-canvas');
+      const container = document.getElementById('dither-background-container');
+      const gl = canvas?.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false });
+      if (!gl) return;
 
+      const VERTEX = `#version 300 es
+      in vec2 aPosition;
+      void main() { gl_Position = vec4(aPosition, 0.0, 1.0); }`;
+
+      const WAVE_FRAGMENT = `#version 300 es
+      precision highp float;
+      precision highp int;
+      uniform vec2 uResolution;
+      uniform float uCell;
+      uniform float uTime;
+      uniform float uWaveSpeed;
+      uniform float uWaveFrequency;
+      uniform float uWaveAmplitude;
+      uniform float uScale;
+      uniform float uContrast;
+      uniform float uBrightness;
+      uniform float uIntro;
+      uniform float uReach;
+      out vec4 outColor;
+
+      vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+      vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+      vec2 fade(vec2 t) { return t * t * t * (t * (t * 6.0 - 15.0) + 10.0); }
+
+      float cnoise(vec2 P) {
+        vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+        vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+        Pi = mod289(Pi);
+        vec4 ix = Pi.xzxz; vec4 iy = Pi.yyww;
+        vec4 fx = Pf.xzxz; vec4 fy = Pf.yyww;
+        vec4 i = permute(permute(ix) + iy);
+        vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0;
+        vec4 gy = abs(gx) - 0.5;
+        vec4 tx = floor(gx + 0.5);
+        gx = gx - tx;
+        vec2 g00 = vec2(gx.x, gy.x); vec2 g10 = vec2(gx.y, gy.y);
+        vec2 g01 = vec2(gx.z, gy.z); vec2 g11 = vec2(gx.w, gy.w);
+        vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+        g00 *= norm.x; g01 *= norm.y; g10 *= norm.z; g11 *= norm.w;
+        float n00 = dot(g00, vec2(fx.x, fy.x));
+        float n10 = dot(g10, vec2(fx.y, fy.y));
+        float n01 = dot(g01, vec2(fx.z, fy.z));
+        float n11 = dot(g11, vec2(fx.w, fy.w));
+        vec2 fadeXY = fade(Pf.xy);
+        vec2 nx = mix(vec2(n00, n01), vec2(n10, n11), fadeXY.x);
+        return 2.3 * mix(nx.x, nx.y, fadeXY.y);
+      }
+
+      float fbm(vec2 p) {
+        float value = 0.0; float amp = 1.0;
+        for (int i = 0; i < 4; i++) {
+          value += amp * abs(cnoise(p));
+          p *= uWaveFrequency;
+          amp *= uWaveAmplitude;
+        }
+        return value;
+      }
+
+      float pattern(vec2 p) {
+        vec2 p2 = p - uTime * uWaveSpeed;
+        return fbm(p + fbm(p2));
+      }
+
+      void main() {
+        vec2 corner = (gl_FragCoord.xy - 0.5) * uCell;
+        vec2 uv = corner / uResolution - 0.5;
+        uv.x *= uResolution.x / uResolution.y;
+
+        float f = pattern(uv / uScale);
+        f = (f - 0.5) * uContrast + 0.5 + uBrightness;
+        float show = clamp((uIntro * uReach - length(uv)) / 0.45, 0.0, 1.0);
+        float v = clamp(f, 0.0, 1.0) * show * show * (3.0 - 2.0 * show);
+        outColor = vec4(floor(v * 255.0) / 255.0, fract(v * 255.0), 0.0, 1.0);
+      }`;
+
+      const DITHER_FRAGMENT = `#version 300 es
+      precision highp float;
+      precision highp int;
+      uniform sampler2D uField;
+      uniform ivec2 uFieldSize;
+      uniform float uCellDevice;
+      uniform float uColorNum;
+      uniform vec3 uWave;
+      uniform vec3 uBackground;
+      out vec4 outColor;
+
+      const float bayer8[64] = float[64](
+        0.0 / 64.0, 48.0 / 64.0, 12.0 / 64.0, 60.0 / 64.0, 3.0 / 64.0, 51.0 / 64.0, 15.0 / 64.0, 63.0 / 64.0,
+        32.0 / 64.0, 16.0 / 64.0, 44.0 / 64.0, 28.0 / 64.0, 35.0 / 64.0, 19.0 / 64.0, 47.0 / 64.0, 31.0 / 64.0,
+        8.0 / 64.0, 56.0 / 64.0, 4.0 / 64.0, 52.0 / 64.0, 11.0 / 64.0, 59.0 / 64.0, 7.0 / 64.0, 55.0 / 64.0,
+        40.0 / 64.0, 24.0 / 64.0, 36.0 / 64.0, 20.0 / 64.0, 43.0 / 64.0, 27.0 / 64.0, 39.0 / 64.0, 23.0 / 64.0,
+        2.0 / 64.0, 50.0 / 64.0, 14.0 / 64.0, 62.0 / 64.0, 1.0 / 64.0, 49.0 / 64.0, 13.0 / 64.0, 61.0 / 64.0,
+        34.0 / 64.0, 18.0 / 64.0, 46.0 / 64.0, 30.0 / 64.0, 33.0 / 64.0, 17.0 / 64.0, 45.0 / 64.0, 29.0 / 64.0,
+        10.0 / 64.0, 58.0 / 64.0, 6.0 / 64.0, 54.0 / 64.0, 9.0 / 64.0, 57.0 / 64.0, 5.0 / 64.0, 53.0 / 64.0,
+        42.0 / 64.0, 26.0 / 64.0, 38.0 / 64.0, 22.0 / 64.0, 41.0 / 64.0, 25.0 / 64.0, 37.0 / 64.0, 21.0 / 64.0
+      );
+
+      float threshold(vec2 cell) {
+        ivec2 c = ivec2(mod(cell, 8.0));
+        return bayer8[c.y * 8 + c.x];
+      }
+
+      vec3 toSrgb(vec3 c) {
+        c = clamp(c, 0.0, 1.0);
+        return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));
+      }
+
+      void main() {
+        vec2 cell = floor(gl_FragCoord.xy / uCellDevice);
+        vec4 sampleValue = texelFetch(uField, clamp(ivec2(cell), ivec2(0), uFieldSize - 1), 0);
+        float f = sampleValue.r + sampleValue.g / 255.0;
+        float t = threshold(cell) - 0.25;
+
+        float levels = max(uColorNum, 1.01) - 1.0;
+        float base = dot(uBackground, vec3(0.2126, 0.7152, 0.0722));
+        vec3 offset = (uWave - vec3(base)) * f + t / levels;
+        float luminance = dot(uBackground + offset, vec3(0.2126, 0.7152, 0.0722));
+        offset -= mix(0.2, 0.0, smoothstep(0.45, 0.8, luminance));
+        bool rising = dot(uWave, vec3(0.2126, 0.7152, 0.0722)) >= base;
+        float lower = rising ? 0.0 : -max(uBackground.r, max(uBackground.g, uBackground.b));
+        float upper = rising ? 1.0 - min(uBackground.r, min(uBackground.g, uBackground.b)) : 0.0;
+        offset = floor(clamp(offset, lower, upper) * levels + 0.5) / levels;
+        outColor = vec4(toSrgb(uBackground + offset), 1.0);
+      }`;
+
+      function compile(type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        return shader;
+      }
+
+      function linkProg(fsSource) {
+        const prog = gl.createProgram();
+        gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERTEX));
+        gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsSource));
+        gl.linkProgram(prog);
+        return prog;
+      }
+
+      const waveProg = linkProg(WAVE_FRAGMENT);
+      const ditherProg = linkProg(DITHER_FRAGMENT);
+
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+      const field = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, field);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      const fb = gl.createFramebuffer();
+
+      let viewW = 1, viewH = 1, cols = 1, rows = 1, cell = 2;
+      const pixelSize = 2;
+      
+      function resize() {
+        viewW = container.clientWidth;
+        viewH = container.clientHeight;
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(viewW * ratio);
+        canvas.height = Math.round(viewH * ratio);
+        cell = Math.max(1, Math.round(pixelSize * ratio));
+        cols = Math.max(1, Math.ceil(canvas.width / cell));
+        rows = Math.max(1, Math.ceil(canvas.height / cell));
+
+        gl.bindTexture(gl.TEXTURE_2D, field);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, cols, rows, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, field, 0);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      let startTime = performance.now();
+      function renderLoop(now) {
+        requestAnimationFrame(renderLoop);
+        const time = (now - startTime) * 0.001;
+
+        // 1. Render pass de ondas (waveSpeed: 0.01, scale: 2.75, contrast: 1.25, brightness: -0.17)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        gl.viewport(0, 0, cols, rows);
+        gl.useProgram(waveProg);
+        gl.uniform2f(gl.getUniformLocation(waveProg, 'uResolution'), viewW, viewH);
+        gl.uniform1f(gl.getUniformLocation(waveProg, 'uCell'), cell / (window.devicePixelRatio || 1));
+        gl.uniform1f(gl.getUniformLocation(waveProg, 'uTime'), time);
+        gl.uniform1f(gl.getUniformLocation(waveProg, 'uWaveSpeed'), 0.01);
+        gl.uniform1f(gl.getUniformLocation(waveProg, 'uWaveFrequency'), 3);
+        gl.uniform1f(gl.getUniformLocation(waveProg, 'uWaveAmplitude'), 0.3);
+        gl.uniform1f(gl.getUniformLocation(waveProg, 'uScale'), 2.75);
+        gl.uniform1f(gl.getUniformLocation(waveProg, 'uContrast'), 1.25);
+        gl.uniform1f(gl.getUniformLocation(waveProg, 'uBrightness'), -0.17);
+        gl.uniform1f(gl.getUniformLocation(waveProg, 'uIntro'), 1.0);
+        gl.uniform1f(gl.getUniformLocation(waveProg, 'uReach'), 2.0);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        // 2. Render pass dither (colorNum: 3, waveColor: #c4b304, backgroundColor: #f00909)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.useProgram(ditherProg);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, field);
+        gl.uniform1i(gl.getUniformLocation(ditherProg, 'uField'), 0);
+        gl.uniform2i(gl.getUniformLocation(ditherProg, 'uFieldSize'), cols, rows);
+        gl.uniform1f(gl.getUniformLocation(ditherProg, 'uCellDevice'), cell);
+        gl.uniform1f(gl.getUniformLocation(ditherProg, 'uColorNum'), 3);
+        gl.uniform3f(gl.getUniformLocation(ditherProg, 'uWave'), 0.768, 0.702, 0.016);     // #c4b304
+        gl.uniform3f(gl.getUniformLocation(ditherProg, 'uBackground'), 0.94, 0.035, 0.035); // #f00909
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+      requestAnimationFrame(renderLoop);
+    })();
+
+    // --- SCRIPT DE TU LOGOTIPO 3D Y MENÚS ---
+    window.addEventListener('load', () => {
+      const mv = document.createElement('model-viewer');
       mv.id = 'logo-3d-interactivo';
       mv.src = '../resources/3DMOPHRA.glb?v=3';
-
       mv.setAttribute('camera-controls', '');
       mv.setAttribute('auto-rotate', '');
       mv.setAttribute('auto-rotate-delay', '0');
       mv.setAttribute('rotation-per-second', '6deg');
       mv.setAttribute('interaction-prompt', 'none');
-
       mv.setAttribute('disable-pan', '');
       mv.setAttribute('camera-target', '-0.1m 0m 0m');
-
       mv.setAttribute('camera-orbit', '0deg 75deg 10m');
       mv.setAttribute('field-of-view', 'auto');
-
       mv.setAttribute('shadow-intensity', '0.5');
       mv.setAttribute('exposure', '1.2');
       mv.setAttribute('environment-image', 'neutral');
@@ -504,26 +737,16 @@
         transition: 'opacity 0.4s ease, visibility 0.4s ease, transform 0.1s ease',
         overflow: 'hidden',
         display: 'block',
-
-        // === 🔥 EL TRUCO DEL ESCALADO CSS ===
         transform: 'scale(1.8)',
         transformOrigin: 'center center'
       });
-
       document.body.appendChild(mv);
 
-      // 2. Control dinámico de los menús nativos MOPHRA (derecha e izquierda)
       const menuGlobal = document.getElementById('mophraGlobalMenu');
       const socialMenu = document.getElementById('socialMenu');
+      if (menuGlobal && menuGlobal.parentElement !== document.body) document.body.appendChild(menuGlobal);
+      if (socialMenu && socialMenu.parentElement !== document.body) document.body.appendChild(socialMenu);
 
-      if (menuGlobal && menuGlobal.parentElement !== document.body) {
-        document.body.appendChild(menuGlobal);
-      }
-      if (socialMenu && socialMenu.parentElement !== document.body) {
-        document.body.appendChild(socialMenu);
-      }
-
-      // 3. Permitir clics a través del wrapper de Carrd manteniendo interactivos sus elementos hijos
       const carrdWrapper = document.getElementById('wrapper') || document.querySelector('main') || document.getElementById('main');
       if (carrdWrapper) {
         carrdWrapper.style.setProperty('pointer-events', 'none', 'important');
@@ -532,7 +755,6 @@
         });
       }
 
-      // 4. CONTROL TOTAL DE VISIBILIDAD Y CLICS SIMULTÁNEO SEGÚN EL HASH
       function verificarRuta() {
         const hash = window.location.hash;
         if (hash === '' || hash === '#' || hash === '#home') {
@@ -561,28 +783,20 @@
           }
         }
       }
-
       window.addEventListener('hashchange', verificarRuta);
       verificarRuta();
 
-      // 5. 🌍 LÓGICA DEL MENÚ DE REDES SOCIALES (DERECHA)
       const socialTrigger = document.getElementById('menuTrigger');
       if (socialTrigger && socialMenu) {
         socialTrigger.onclick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+          e.preventDefault(); e.stopPropagation();
           socialMenu.classList.toggle('menu-open');
         };
-
-        // Cerrar menú de redes si se hace clic fuera de él
         document.addEventListener('click', (e) => {
-          if (!socialMenu.contains(e.target)) {
-            socialMenu.classList.remove('menu-open');
-          }
+          if (!socialMenu.contains(e.target)) socialMenu.classList.remove('menu-open');
         });
       }
 
-      // 6. Lógica de animación del botón del menú izquierdo
       const PATH_LOGO = "M486.86,74.1l43.7.72c315.79,23.24,500.51,374.15,332.93,647.91-158.69,259.22-531.3,272.98-709.23,26.4C-45.68,472.05,147.58,85.24,486.86,74.1ZM901.07,465.81c-8.75-115.9-71.16-224.09-164.68-291.82-181.81-131.66-436.09-88.78-565.13,93.5-40.96,57.86-66.79,127.33-72.19,198.31h239.5l90,89.98,54.06-53.99-123.49-126.35,137.92-138.24,3.93-.93,140.01,139.17-123.49,126.35,53.92,52.94,89.14-88.93h240.5ZM499.7,267.88l-107.56,108.29,108.29,107.56,107.56-108.29-108.29-107.56ZM240.07,489.81H98.07c-2.86,10.5.77,21.33,0,32h110.5l31.5-32ZM297.07,489.81h-23.5l-31.5,32h23.5l31.5-32ZM757.07,521.81l-31.5-32h-23.5l32.5,32h22.5ZM902.07,489.81h-143l31.5,32h111.5c-.77-10.67,2.86-21.5,0-32ZM187.07,577.81h85.5l71.03-71.02c.78-1.08.51-1.86,0-2.96-.39-.84-12.26-12.79-13.17-12.95l-54.38,53.41-57.28.72c-2.03.6-27.76,26.59-30.21,29.79-.77,1.01-1.93,1.26-1.49,3.01ZM813.07,577.81l-32.7-32.8-56.28-.72-55.38-53.41c-.91.16-12.78,12.11-13.17,12.95-.51,1.1-.78,1.88,0,2.96l71.03,71.02h86.5ZM710.9,843.65l-.36-115.82-210.12-209.95-210.16,209.63.3,116.29c102.67,64.08,233.16,76.11,347.01,35.03,25.59-9.24,49.76-21.75,73.32-35.18ZM131.07,632.81h144.5l98.48-98.5-12.48-12.48-78.52,78.46-119.46.54-32.52,31.98ZM868.07,632.81l-32.52-31.98-119.46-.54-78.52-78.46c-2.2,3.31-12.84,10.05-11.03,13.96l97.03,97.02h144.5ZM185.07,544.81h-85l4.88,32.42,47.41.37,32.7-32.8ZM900.07,544.81h-86l32.7,32.8,48.41-.37,4.88-32.42ZM871.07,656.81h-156.5l-106-105.98-20.43,21.34,145.93,146.14v109.5c60.22-42.95,108.18-102.77,137-171ZM266.07,827.81v-109.5l145.98-146-21.48-20.54-106,105.04h-155.5c28.8,68.24,76.78,128.03,137,171ZM129.07,600.81h-19l4.01,15,14.99-15ZM890.07,600.81h-20l15.99,16,4.01-16Z";
       const PATH_X = "M500,50 C251.5,50 50,251.5 50,500 C50,748.5 251.5,950 500,950 C748.5,950 950,748.5 950,500 C950,251.5 748.5,50 500,50 Z M500,120 C709.9,120 880,290.1 880,500 C880,709.9 709.9,880 500,880 C290.1,880 120,709.9 120,500 C120,290.1 290.1,120 500,120 Z M330,260 L260,330 L430,500 L260,670 L330,740 L500,570 L670,740 L740,670 L570,500 L740,330 L670,260 L500,430 Z";
 
@@ -598,26 +812,19 @@
           menuGlobal.classList.add('menu-open');
           setTimeout(() => vectorPath.setAttribute('d', PATH_X), 200);
         }
-
         function cerrarMenu() {
           if (!menuGlobal.classList.contains('menu-open')) return;
           menuGlobal.classList.remove('menu-open');
           if (relWrap) relWrap.classList.remove('submenu-open');
           setTimeout(() => vectorPath.setAttribute('d', PATH_LOGO), 200);
         }
-
         if (relToggle && relWrap) {
-          relToggle.onclick = (e) => {
-            e.preventDefault(); e.stopPropagation();
-            relWrap.classList.toggle('submenu-open');
-          };
+          relToggle.onclick = (e) => { e.preventDefault(); e.stopPropagation(); relWrap.classList.toggle('submenu-open'); };
         }
-
         toggleBtn.onclick = (e) => {
           e.preventDefault(); e.stopPropagation();
           menuGlobal.classList.contains('menu-open') ? cerrarMenu() : abrirMenu();
         };
-
         if (overlay) overlay.onclick = (e) => { e.stopPropagation(); cerrarMenu(); };
         navLinks.forEach(l => l.onclick = () => cerrarMenu());
 
@@ -636,15 +843,14 @@
             timer = setTimeout(() => { void toggleBtn.offsetWidth; toggleBtn.classList.add('animar-entrada'); }, 400);
           }
         }
-
         window.addEventListener('hashchange', animarBoton);
         animarBoton();
       }
     });
   </script>
-
 </body>
-<!-- 1. ENCABEZADO SUPERIOR FLOTANTE (Solo Home / Ruta Raíz) -->
+
+<!-- 1. ENCABEZADO SUPERIOR FLOTANTE -->
 <div id="mophraTopHeader" class="mophra-top-header">
     <a href="/releases" class="top-nav-img-btn">
         <img src="../resources/main-releases.png" alt="Releases">
@@ -660,7 +866,6 @@
 </div>
 
 <style>
-    /* --- ESTILOS: ENCABEZADO SUPERIOR --- */
     .mophra-top-header {
         position: fixed !important;
         top: 18px !important;
@@ -699,7 +904,6 @@
         filter: none !important;
     }
 
-    /* --- ESTILOS: CORTINA DE TRANSICIÓN --- */
     .cortina-contenedor {
         position: fixed;
         top: -15vh;
@@ -759,13 +963,11 @@
             }
         }
 
-        // 1. Ejecutar al cargar la página de forma normal
         window.addEventListener('load', () => {
             checkRouteVisibility();
             setTimeout(abrirCortina, 100);
         });
 
-        // 2. CORRECCIÓN PARA FLECHAS DE RETORNO (BFCache / Persistencia del navegador)
         window.addEventListener('pageshow', (event) => {
             if (event.persisted) {
                 if (cortina) {
@@ -776,7 +978,6 @@
             }
         });
 
-        // 3. Control de clics en enlaces internos con animación de bajada de cortina
         document.addEventListener('click', (e) => {
             const link = e.target.closest('a');
             if (!link) return;
