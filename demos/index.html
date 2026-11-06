@@ -221,7 +221,7 @@
       margin-bottom: 26px;
       display: flex;
       flex-direction: column;
-      align-items: center; /* Centra las etiquetas y los campos */
+      align-items: center;
     }
 
     .demo-form-group label {
@@ -231,7 +231,7 @@
       text-transform: uppercase;
       letter-spacing: 0.1em;
       margin-bottom: 10px;
-      text-align: center; /* Asegura que el texto de la etiqueta esté centrado */
+      text-align: center;
       width: 100%;
     }
 
@@ -551,6 +551,7 @@
     };
   </script>
 
+  <!-- 🧭 MENÚ MOPHRA EN MODO ESPEJO (IZQUIERDA) -->
   <div class="mophra-global-container" id="mophraGlobalMenu">
     <div class="mophra-global-overlay"></div>
 
@@ -562,11 +563,11 @@
 
     <nav class="mophra-signs-nav">
       <a href="/" class="mophra-sign-item">HOME</a>
-      
       <a href="/artists/" class="mophra-sign-item">ARTISTS</a>
 
       <div class="mophra-sign-item mophra-dropdown-wrapper">
         <div class="mophra-sign-header">
+          <a href="/releases/" class="mophra-sign-link">RELEASES</a>
           <button type="button" class="mophra-submenu-toggle" id="mophraReleasesToggle" aria-label="Toggle Releases Submenu">
             <span class="mophra-frolov-icon">
               <span class="line-top"></span>
@@ -574,7 +575,6 @@
               <span class="line-bot"></span>
             </span>
           </button>
-          <a href="/releases/" class="mophra-sign-link">RELEASES</a>
         </div>
         <div class="mophra-submenu" id="mophraReleasesSubmenu">
           <a href="/releases/eps/" class="mophra-sub-item">EPs</a>
@@ -586,7 +586,7 @@
       <a href="/demos/" class="mophra-sign-item">DEMOS</a>
       <a href="/radio/" class="mophra-sign-item">RADIO</a>
     </nav>
-</div>
+  </div>
   
   <style>
     .mophra-global-container {
@@ -598,23 +598,23 @@
       font-family: 'RelicusMono', monospace !important; user-select: none !important; z-index: 999999 !important; pointer-events: none !important;
     }
 
-    @keyframes entradaBoton { 0% { transform: translateY(-100px); opacity: 0; } 70% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
-    @keyframes salidaBoton { 0% { transform: translateY(0); opacity: 1; } 30% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
+    @keyframes entradaBotonIzquierda { 0% { transform: translateY(-100px); opacity: 0; } 70% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+    @keyframes salidaBotonIzquierda { 0% { transform: translateY(0); opacity: 1; } 30% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
 
     .mophra-global-btn {
-      position: fixed !important; top: 30px !important; right: 30px !important; z-index: 1000000 !important;
+      position: fixed !important; top: 30px !important; left: 30px !important; z-index: 1000000 !important;
       background: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important;
-      border-radius: 50% !important; width: 70px !important; height: 70px !important; cursor: pointer !important;
+      border-radius: 50% !important; width: 78px !important; height: 78px !important; cursor: pointer !important;
       display: flex !important; align-items: center !important; justify-content: center !important;
       backdrop-filter: blur(5px) !important; pointer-events: auto !important; padding: 0 !important; opacity: 0 !important;
       transition: background 0.3s, transform 0.3s !important;
     }
 
-    .mophra-global-btn.animar-entrada { opacity: 1 !important; animation: entradaBoton 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards !important; }
-    .mophra-global-btn.animar-salida { opacity: 1 !important; animation: salidaBoton 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards !important; }
+    .mophra-global-btn.animar-entrada { opacity: 1 !important; animation: entradaBotonIzquierda 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards !important; }
+    .mophra-global-btn.animar-salida { opacity: 1 !important; animation: salidaBotonIzquierda 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards !important; }
     .mophra-global-btn:hover { background: rgba(255, 255, 255, 0.25) !important; transform: scale(1.05) !important; }
 
-    .mophra-svg-element { width: 62px !important; height: 62px !important; display: block !important; transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: none; }
+    .mophra-svg-element { width: 70px !important; height: 70x !important; display: block !important; transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: none; }
     #mophraVectorPath { transition: opacity 0.2s ease, d 0.2s ease; }
     .mophra-global-container.menu-open .mophra-svg-element { transform: rotate(180deg); }
     .mophra-global-container.menu-open { pointer-events: auto !important; }
@@ -622,16 +622,16 @@
     .mophra-global-overlay {
       position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
       background-color: #000000 !important;
-      transform: translateX(100%) !important;
+      transform: translateX(-100%) !important;
       transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1) !important;
       pointer-events: none !important;
     }
     .mophra-global-container.menu-open .mophra-global-overlay { transform: translateX(0) !important; pointer-events: auto !important; }
 
     .mophra-signs-nav {
-      position: absolute !important; right: 0 !important; top: 0 !important; height: 100% !important; max-height: 100vh !important;
-      display: flex !important; flex-direction: column !important; align-items: flex-end !important;
-      padding-right: 40px !important; padding-top: 130px !important; padding-bottom: 30px !important; box-sizing: border-box !important;
+      position: absolute !important; left: 0 !important; top: 0 !important; height: 100% !important; max-height: 100vh !important;
+      display: flex !important; flex-direction: column !important; align-items: flex-start !important;
+      padding-left: 40px !important; padding-top: 130px !important; padding-bottom: 30px !important; box-sizing: border-box !important;
       z-index: 100000 !important; pointer-events: none !important;
       overflow-y: auto !important; overflow-x: hidden !important;
     }
@@ -640,7 +640,7 @@
     .mophra-sign-item {
       display: block !important; color: #ffffff !important; text-decoration: none !important; text-transform: uppercase !important;
       font-weight: 900 !important; font-size: clamp(40px, 5.5vw, 80px) !important; line-height: 0.92 !important; letter-spacing: -2px !important;
-      transform: translateX(100vw) !important; transform-origin: right center !important; width: max-content !important;
+      transform: translateX(-100vw) !important; transform-origin: left center !important; width: max-content !important;
       pointer-events: none !important; visibility: hidden !important;
       transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1), color 0.1s ease 0s, visibility 0s linear 0.4s !important;
     }
@@ -653,8 +653,8 @@
 
     a.mophra-sign-item:hover, .mophra-sign-link:hover { color: #969696 !important; }
 
-    .mophra-dropdown-wrapper { display: flex !important; flex-direction: column !important; align-items: flex-end !important; }
-    .mophra-sign-header { display: flex !important; align-items: center !important; justify-content: flex-end !important; gap: 18px !important; width: 100% !important; }
+    .mophra-dropdown-wrapper { display: flex !important; flex-direction: column !important; align-items: flex-start !important; }
+    .mophra-sign-header { display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 18px !important; width: 100% !important; }
     .mophra-sign-link { color: inherit !important; text-decoration: none !important; }
     .mophra-submenu-toggle { background: none !important; border: none !important; cursor: pointer !important; padding: 0 !important; display: flex !important; align-items: center !important; }
 
@@ -667,9 +667,9 @@
       transition: transform 0.45s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.25s ease, width 0.3s ease, margin 0.3s ease !important;
       transform-origin: center !important;
     }
-    .mophra-frolov-icon .line-top { width: 40% !important; margin-right: auto !important; margin-left: 0 !important; }
-    .mophra-frolov-icon .line-mid { width: 100% !important; margin-left: auto !important; }
-    .mophra-frolov-icon .line-bot { width: 60% !important; margin-left: auto !important; }
+    .mophra-frolov-icon .line-top { width: 40% !important; margin-left: auto !important; margin-right: 0 !important; }
+    .mophra-frolov-icon .line-mid { width: 100% !important; margin-right: auto !important; }
+    .mophra-frolov-icon .line-bot { width: 60% !important; margin-right: auto !important; }
 
     .mophra-dropdown-wrapper.submenu-open .mophra-frolov-icon .line-top {
       width: 100% !important; margin-left: 0 !important;
@@ -682,10 +682,10 @@
     }
 
     .mophra-submenu {
-      display: flex !important; flex-direction: column !important; align-items: flex-end !important;
+      display: flex !important; flex-direction: column !important; align-items: flex-start !important;
       max-height: 0 !important; overflow: hidden !important; opacity: 0 !important;
       transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease !important; margin-top: 0px !important;
-      padding-left: 20px !important;
+      padding-right: 20px !important;
     }
     .mophra-dropdown-wrapper.submenu-open .mophra-submenu { max-height: 300px !important; opacity: 1 !important; margin-top: 10px !important; }
 
@@ -694,14 +694,14 @@
       font-size: clamp(20px, 3vw, 36px) !important; padding: 4px 0 !important;
       transition: color 0.2s ease, transform 0.2s ease !important; display: block !important;
     }
-    .mophra-sub-item:hover { color: #ffffff !important; transform: translateX(-5px) !important; }
+    .mophra-sub-item:hover { color: #ffffff !important; transform: translateX(5px) !important; }
 
     @media (max-width: 768px) {
-      .mophra-global-btn { top: 12px !important; right: 12px !important; width: 54px !important; height: 54px !important; }
+      .mophra-global-btn { top: 12px !important; left: 12px !important; width: 54px !important; height: 54px !important; }
       .mophra-svg-element { width: 36px !important; height: 36px !important; }
       .mophra-sign-item { font-size: clamp(48px, 10vw, 58px) !important; }
       .mophra-sub-item { font-size: clamp(28px, 7vw, 34px) !important; }
-      .mophra-signs-nav { padding-right: 15px !important; padding-top: 85px !important; }
+      .mophra-signs-nav { padding-left: 15px !important; padding-top: 85px !important; }
 
       .mophra-frolov-icon { width: 26px !important; height: 20px !important; }
       .mophra-frolov-icon span { height: 3px !important; }
@@ -712,7 +712,6 @@
 
   <script>
   (function() {
-    // Inyectar estilos globales de selección de texto automáticamente en el <head>
     if (!document.getElementById('mophra-global-selection-style')) {
       const selectionStyle = document.createElement('style');
       selectionStyle.id = 'mophra-global-selection-style';
@@ -793,11 +792,9 @@
     else initMenu();
   })();
   </script>
-   <script src="/cortina.js"></script>
-  
-
 </body>
-  <!-- PRECARGA OPTIMIZADA DE LA CORTINA (Evita descargas repetidas) -->
+
+<!-- PRECARGA OPTIMIZADA DE LA CORTINA -->
 <link rel="preload" href="../resources/cortina-000000.webp" as="image">
 
 <!-- CORTINA METÁLICA DE TRANSICIÓN -->
@@ -851,12 +848,10 @@
             }
         }
 
-        // 1. Abrir la cortina al entrar a la página (usa caché del navegador)
         window.addEventListener('load', () => {
             setTimeout(abrirCortina, 100);
         });
 
-        // 2. Soporte para el botón de retroceso (BFCache)
         window.addEventListener('pageshow', (event) => {
             if (event.persisted && cortina) {
                 cortina.classList.remove('cerrar');
@@ -864,7 +859,6 @@
             }
         });
 
-        // 3. Interceptar clics para cerrar la cortina antes de cambiar de página
         document.addEventListener('click', (e) => {
             const link = e.target.closest('a');
             if (!link) return;
