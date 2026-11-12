@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOPHRA | Compilations</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Fallback para tipografía industrial/mono) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <!-- PRECARGA OPTIMIZADA DE LA CORTINA -->
+    <link rel="preload" href="../../resources/cortina-000000.webp" as="image">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Chakra Petch"', 'sans-serif'],
+                        mono: ['"Share Tech Mono"', 'monospace'],
+                        relicus: ['"RelicusMono"', '"Share Tech Mono"', 'monospace'],
+                    },
+                    colors: {
+                        neonPink: '#ff0055',
+                        mophraRed: '#F5260A',
+                        mophraYellow: '#fae100',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- CARGA DE FUENTE PERSONALIZADA --- */
+        @font-face {
+            font-family: 'RelicusMono';
+            src: url('../../resources/relicusmono.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* --- SELECCIÓN DE TEXTO GLOBAL --- */
+        *::selection, ::selection {
+            background-color: #fae100 !important;
+            color: #030303 !important;
+        }
+
+        /* Estilos base */
+        body {
+            font-family: 'Chakra Petch', sans-serif;
+            background-color: #0b0b0e;
+            overflow: hidden;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- EFECTO TYPEWRITER CENTRADO PARA TÍTULO 'compilations' (12 letras = 12 pasos) --- */
+        .mophra-tw-header {
+            width: 100%;
+            padding-top: 26px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media (min-width: 769px) {
+            .mophra-tw-header {
+                padding-top: 38px;
+            }
+        }
+
+        .mophra-typewriter-compilations {
+            font-family: 'RelicusMono', 'Share Tech Mono', monospace !important;
+            font-size: 30px;
+            line-height: 1.2;
+            color: #ffffff;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            max-width: 0;
+            text-shadow: 0 4px 14px rgba(0, 0, 0, 0.9);
+            animation: mophraTypewriterCompilations 0.75s steps(12, end) 0.45s forwards;
+        }
+
+        .mophra-typewriter-compilations::after {
+            content: '▋';
+            display: inline-block;
+            color: #ffffff;
+            font-size: 24px;
+            margin-left: 4px;
+            opacity: 1;
+            animation: mophraBlink 0.5s step-end infinite 0.45s;
+        }
+
+        @keyframes mophraTypewriterCompilations {
+            from { max-width: 0; }
+            to { max-width: 310px; }
+        }
+
+        @keyframes mophraBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @media (min-width: 480px) {
+            .mophra-typewriter-compilations { font-size: 38px; }
+            .mophra-typewriter-compilations::after { font-size: 30px; }
+            @keyframes mophraTypewriterCompilations {
+                from { max-width: 0; }
+                to { max-width: 390px; }
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mophra-typewriter-compilations { font-size: 52px; }
+            .mophra-typewriter-compilations::after { font-size: 40px; }
+            @keyframes mophraTypewriterCompilations {
+                from { max-width: 0; }
+                to { max-width: 540px; }
+            }
+        }
+
+        /* --- ESTILOS CORTINA METÁLICA DE TRANSICIÓN --- */
+        .cortina-contenedor {
+            position: fixed;
+            top: -15vh;
+            left: 0;
+            width: 100vw;
+            height: 115vh;
+            background: linear-gradient(135deg, #141416 0%, #2a2c32 50%, #101012 100%);
+            z-index: 9999999 !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            pointer-events: none;
+            transform: translateY(0%);
+        }
+
+        .cortina-contenedor.cerrar {
+            pointer-events: auto;
+            transform: translateY(0%);
+            transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.05) !important;
+        }
+
+        .cortina-contenedor.abrir {
+            transform: translateY(-100%);
+            transition: transform 0.7s cubic-bezier(0.6, -0.28, 0.735, 0.045) !important;
+        }
+
+        .cortina-imagen {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- ESTILOS MENÚ GLOBAL MOPHRA --- */
+        .mophra-global-container {
+            position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100% !important; height: 100vh !important;
+            background-color: transparent !important;
+            overflow: hidden !important;
+            overflow-x: hidden !important;
+            font-family: 'RelicusMono', 'Share Tech Mono', monospace !important; user-select: none !important; z-index: 999999 !important; pointer-events: none !important;
+        }
+
+        @keyframes entradaBotonIzquierda { 0% { transform: translateY(-100px); opacity: 0; } 70% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes salidaBotonIzquierda { 0% { transform: translateY(0); opacity: 1; } 30% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
+
+        .mophra-global-btn {
+            position: fixed !important; top: 30px !important; left: 30px !important; z-index: 1000000 !important;
+            background: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 50% !important; width: 78px !important; height: 78px !important; cursor: pointer !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
+            backdrop-filter: blur(5px) !important; pointer-events: auto !important; padding: 0 !important; opacity: 0 !important;
+            transition: background 0.3s, transform 0.3s !important;
+        }
+
+        .mophra-global-btn.animar-entrada { opacity: 1 !important; animation: entradaBotonIzquierda 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards !important; }
+        .mophra-global-btn.animar-salida { opacity: 1 !important; animation: salidaBotonIzquierda 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards !important; }
+        .mophra-global-btn:hover { background: rgba(255, 255, 255, 0.25) !important; transform: scale(1.05) !important; }
+
+        .mophra-svg-element { width: 76px !important; height: 76px !important; display: block !important; transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: none; }
+        #mophraVectorPath { transition: opacity 0.2s ease, d 0.2s ease; }
+        .mophra-global-container.menu-open .mophra-svg-element { transform: rotate(180deg); }
+        .mophra-global-container.menu-open { pointer-events: auto !important; }
+
+        .mophra-global-overlay {
+            position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
+            background-color: #000000 !important;
+            transform: translateX(-100%) !important;
+            transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1) !important;
+            pointer-events: none !important;
+        }
+        .mophra-global-container.menu-open .mophra-global-overlay { transform: translateX(0) !important; pointer-events: auto !important; }
+
+        .mophra-signs-nav {
+            position: absolute !important; left: 0 !important; top: 0 !important; height: 100% !important; max-height: 100vh !important;
+            display: flex !important; flex-direction: column !important; align-items: flex-start !important;
+            padding-left: 40px !important; padding-top: 130px !important; padding-bottom: 30px !important; box-sizing: border-box !important;
+            z-index: 100000 !important; pointer-events: none !important;
+            overflow-y: auto !important; overflow-x: hidden !important;
+        }
+        .mophra-global-container.menu-open .mophra-signs-nav { pointer-events: auto !important; }
+
+        .mophra-sign-item {
+            display: block !important; color: #ffffff !important; text-decoration: none !important; text-transform: uppercase !important;
+            font-weight: 900 !important; font-size: clamp(40px, 5.5vw, 80px) !important; line-height: 0.92 !important; letter-spacing: -2px !important;
+            transform: translateX(-100vw) !important; transform-origin: left center !important; width: max-content !important;
+            pointer-events: none !important; visibility: hidden !important;
+            transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1), color 0.1s ease 0s, visibility 0s linear 0.4s !important;
+        }
+        .mophra-global-container.menu-open .mophra-sign-item { transform: translateX(0) !important; pointer-events: auto !important; visibility: visible !important; }
+        .mophra-global-container.menu-open .mophra-sign-item:nth-child(1) { transition-delay: 0.15s, 0s, 0.15s !important; }
+        .mophra-global-container.menu-open .mophra-sign-item:nth-child(2) { transition-delay: 0.22s, 0s, 0.22s !important; }
+        .mophra-global-container.menu-open .mophra-sign-item:nth-child(3) { transition-delay: 0.29s, 0s, 0.29s !important; }
+        .mophra-global-container.menu-open .mophra-sign-item:nth-child(4) { transition-delay: 0.36s, 0s, 0.36s !important; }
+        .mophra-global-container.menu-open .mophra-sign-item:nth-child(5) { transition-delay: 0.43s, 0s, 0.43s !important; }
+
+        a.mophra-sign-item:hover, .mophra-sign-link:hover { color: #969696 !important; }
+
+        .mophra-dropdown-wrapper { display: flex !important; flex-direction: column !important; align-items: flex-start !important; }
+        .mophra-sign-header { display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 18px !important; width: 100% !important; }
+        .mophra-sign-link { color: inherit !important; text-decoration: none !important; }
+        .mophra-submenu-toggle { background: none !important; border: none !important; cursor: pointer !important; padding: 0 !important; display: flex !important; align-items: center !important; }
+
+        .mophra-frolov-icon {
+            width: clamp(28px, 3.8vw, 44px) !important; height: clamp(20px, 3vw, 30px) !important;
+            display: flex !important; flex-direction: column !important; justify-content: space-between !important; position: relative !important;
+        }
+        .mophra-frolov-icon span {
+            display: block !important; height: clamp(3px, 0.4vw, 5px) !important; background-color: #ffffff !important; border-radius: 10px !important;
+            transition: transform 0.45s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.25s ease, width 0.3s ease, margin 0.3s ease !important;
+            transform-origin: center !important;
+        }
+        .mophra-frolov-icon .line-top { width: 40% !important; margin-left: auto !important; margin-right: 0 !important; }
+        .mophra-frolov-icon .line-mid { width: 100% !important; margin-right: auto !important; }
+        .mophra-frolov-icon .line-bot { width: 60% !important; margin-right: auto !important; }
+
+        .mophra-dropdown-wrapper.submenu-open .mophra-frolov-icon .line-top {
+            width: 100% !important; margin-left: 0 !important;
+            transform: translateY(calc(clamp(20px, 3vw, 30px) / 2 - clamp(3px, 0.4vw, 5px) / 2)) rotate(45deg) !important;
+        }
+        .mophra-dropdown-wrapper.submenu-open .mophra-frolov-icon .line-mid { opacity: 0 !important; transform: scaleX(0) !important; }
+        .mophra-dropdown-wrapper.submenu-open .mophra-frolov-icon .line-bot {
+            width: 100% !important; margin-left: 0 !important;
+            transform: translateY(calc(-1 * (clamp(20px, 3vw, 30px) / 2 - clamp(3px, 0.4vw, 5px) / 2))) rotate(-45deg) !important;
+        }
+
+        .mophra-submenu {
+            display: flex !important; flex-direction: column !important; align-items: flex-start !important;
+            max-height: 0 !important; overflow: hidden !important; opacity: 0 !important;
+            transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease !important; margin-top: 0px !important;
+            padding-right: 20px !important;
+        }
+        .mophra-dropdown-wrapper.submenu-open .mophra-submenu { max-height: 300px !important; opacity: 1 !important; margin-top: 10px !important; }
+
+        .mophra-sub-item {
+            color: #a0a0a0 !important; text-decoration: none !important; text-transform: lowercase !important;
+            font-size: clamp(20px, 3vw, 36px) !important; padding: 4px 0 !important;
+            transition: color 0.2s ease, transform 0.2s ease !important; display: block !important;
+        }
+        .mophra-sub-item:hover { color: #ffffff !important; transform: translateX(5px) !important; }
+
+        @media (max-width: 768px) {
+            .mophra-global-btn { top: 12px !important; left: 12px !important; width: 54px !important; height: 54px !important; }
+            .mophra-svg-element { width: 36px !important; height: 36px !important; }
+            .mophra-sign-item { font-size: clamp(48px, 10vw, 58px) !important; }
+            .mophra-sub-item { font-size: clamp(28px, 7vw, 34px) !important; }
+            .mophra-signs-nav { padding-left: 15px !important; padding-top: 85px !important; }
+
+            .mophra-frolov-icon { width: 26px !important; height: 20px !important; }
+            .mophra-frolov-icon span { height: 3px !important; }
+            .mophra-dropdown-wrapper.submenu-open .mophra-frolov-icon .line-top { transform: translateY(8.5px) rotate(45deg) !important; }
+            .mophra-dropdown-wrapper.submenu-open .mophra-frolov-icon .line-bot { transform: translateY(-8.5px) rotate(-45deg) !important; }
+        }
+
+        /* --- SCROLLBAR Y BLOQUES DEL MENÚ DERECHO (4 ELEMENTOS EXACTOS) --- */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #ff0055;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #ff3377;
+        }
+
+        /* Contenedor exacto para 4 botones de 44px + 3 gaps de 8px + 2px padding = 202px */
+        #menu-list {
+            height: 202px;
+            padding-top: 1px;
+            padding-bottom: 1px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        /* Bloque rectangular limpio sin cortes diagonales */
+        .menu-item {
+            height: 44px;
+            min-height: 44px;
+            max-height: 44px;
+            flex-shrink: 0;
+            transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .menu-item.active {
+            background-color: #ff0055;
+            border-color: #ff0055;
+            color: #ffffff;
+            transform: translateX(-5px);
+            box-shadow: -4px 0 14px rgba(255, 0, 85, 0.65);
+        }
+        .menu-item.active::after {
+            content: '';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 7px;
+            height: 7px;
+            background-color: #ffffff;
+            border-radius: 50%;
+        }
+
+        /* Transición suave para cambio de fondo */
+        .bg-layer {
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Animaciones para cambio de datos */
+        .fade-in-element {
+            animation: fadeIn 0.35s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Efecto scanline retro para el fondo */
+        .scanline {
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 0, 0, 0.25) 50%,
+                rgba(0, 0, 0, 0.25)
+            );
+            background-size: 100% 4px;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen relative overflow-hidden text-white flex flex-col justify-between">
+
+    <!-- Capa de Fondo 1 (Imagen principal activa) -->
+    <div id="bg-layer-1" class="bg-layer absolute inset-0 bg-cover bg-center z-0 opacity-100"></div>
+    <!-- Capa de Fondo 2 (Para transición suave entre imágenes) -->
+    <div id="bg-layer-2" class="bg-layer absolute inset-0 bg-cover bg-center z-0 opacity-0"></div>
+
+    <!-- Overlay de Gradiente Magenta/Oscuro y Scanlines -->
+    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/60 z-0 pointer-events-none"></div>
+    <div class="absolute inset-0 scanline z-0 pointer-events-none opacity-40"></div>
+
+    <!-- CORTINA METÁLICA DE TRANSICIÓN -->
+    <div id="cortina-transicion" class="cortina-contenedor">
+        <img src="../../resources/cortina-000000.webp" alt="Cargando..." class="cortina-imagen" onerror="this.style.display='none'">
+    </div>
+
+    <!-- MENÚ GLOBAL DE NAVEGACIÓN MOPHRA -->
+    <div class="mophra-global-container" id="mophraGlobalMenu">
+        <div class="mophra-global-overlay"></div>
+
+        <button class="mophra-global-btn" id="mophraVectorBtn" title="Ver menú">
+          <svg id="mophraSvgLogo" viewBox="0 0 1000 1000" class="mophra-svg-element">
+            <path id="mophraVectorPath" fill="#ffffff" d="M486.86,74.1l43.7.72c315.79,23.24,500.51,374.15,332.93,647.91-158.69,259.22-531.3,272.98-709.23,26.4C-45.68,472.05,147.58,85.24,486.86,74.1ZM901.07,465.81c-8.75-115.9-71.16-224.09-164.68-291.82-181.81-131.66-436.09-88.78-565.13,93.5-40.96,57.86-66.79,127.33-72.19,198.31h239.5l90,89.98,54.06-53.99-123.49-126.35,137.92-138.24,3.93-.93,140.01,139.17-123.49,126.35,53.92,52.94,89.14-88.93h240.5ZM499.7,267.88l-107.56,108.29,108.29,107.56,107.56-108.29-108.29-107.56ZM240.07,489.81H98.07c-2.86,10.5.77,21.33,0,32h110.5l31.5-32ZM297.07,489.81h-23.5l-31.5,32h23.5l31.5-32ZM757.07,521.81l-31.5-32h-23.5l32.5,32h22.5ZM902.07,489.81h-143l31.5,32h111.5c-.77-10.67,2.86-21.5,0-32ZM187.07,577.81h85.5l71.03-71.02c.78-1.08.51-1.86,0-2.96-.39-.84-12.26-12.79-13.17-12.95l-54.38,53.41-57.28.72c-2.03.6-27.76,26.59-30.21,29.79-.77,1.01-1.93,1.26-1.49,3.01ZM813.07,577.81l-32.7-32.8-56.28-.72-55.38-53.41c-.91.16-12.78,12.11-13.17,12.95-.51,1.1-.78,1.88,0,2.96l71.03,71.02h86.5ZM710.9,843.65l-.36-115.82-210.12-209.95-210.16,209.63.3,116.29c102.67,64.08,233.16,76.11,347.01,35.03,25.59-9.24,49.76-21.75,73.32-35.18ZM131.07,632.81h144.5l98.48-98.5-12.48-12.48-78.52,78.46-119.46.54-32.52,31.98ZM868.07,632.81l-32.52-31.98-119.46-.54-78.52-78.46c-2.2,3.31-12.84,10.05-11.03,13.96l97.03,97.02h144.5ZM185.07,544.81h-85l4.88,32.42,47.41.37,32.7-32.8ZM900.07,544.81h-86l32.7,32.8,48.41-.37,4.88-32.42ZM871.07,656.81h-156.5l-106-105.98-20.43,21.34,145.93,146.14v109.5c60.22-42.95,108.18-102.77,137-171ZM266.07,827.81v-109.5l145.98-146-21.48-20.54-106,105.04h-155.5c28.8,68.24,76.78,128.03,137,171ZM129.07,600.81h-19l4.01,15,14.99-15ZM890.07,600.81h-20l15.99,16,4.01-16Z"/>
+          </svg>
+        </button>
+
+        <nav class="mophra-signs-nav">
+          <a href="/" class="mophra-sign-item">HOME</a>
+          <a href="/artists/" class="mophra-sign-item">ARTISTS</a>
+
+          <div class="mophra-sign-item mophra-dropdown-wrapper">
+            <div class="mophra-sign-header">
+              <a href="/releases/" class="mophra-sign-link">RELEASES</a>
+              <button type="button" class="mophra-submenu-toggle" id="mophraReleasesToggle" aria-label="Toggle Releases Submenu">
+                <span class="mophra-frolov-icon">
+                  <span class="line-top"></span>
+                  <span class="line-mid"></span>
+                  <span class="line-bot"></span>
+                </span>
+              </button>
+            </div>
+            <div class="mophra-submenu" id="mophraReleasesSubmenu">
+              <a href="/releases/eps/" class="mophra-sub-item">EPs</a>
+              <a href="/releases/albums/" class="mophra-sub-item">Albums</a>
+              <a href="/releases/compilations/" class="mophra-sub-item">Compilations</a>
+            </div>
+          </div>
+
+          <a href="/demos/" class="mophra-sign-item">DEMOS</a>
+          <a href="/radio/" class="mophra-sign-item">RADIO</a>
+        </nav>
+    </div>
+
+    <!-- HEADER / TÍTULO ESTÁTICO CENTRADO CON EFECTO TYPEWRITER -->
+    <header class="relative z-10 mophra-tw-header pointer-events-none">
+        <h1 class="mophra-typewriter-compilations">compilations</h1>
+    </header>
+
+    <!-- ÁREA CENTRAL CON MENÚ Y BANNER A LA DERECHA -->
+    <main class="relative z-10 flex-grow flex justify-end items-center px-4 md:px-12 py-2">
+        
+        <!-- Menú Contenedor (Lado Derecho) -->
+        <aside class="w-full max-w-xs md:max-w-sm flex flex-col gap-3.5">
+            
+            <div class="flex items-center justify-between text-xs font-mono text-gray-300 bg-black/75 px-3 py-1.5 rounded border-l-2 border-neonPink backdrop-blur-sm">
+                <span class="uppercase tracking-wider">SELECT COMPILATION</span>
+                <span id="compilation-counter">01 / 06</span>
+            </div>
+
+            <!-- Menú de ítems: Estrictamente 4 visibles + Scrollbar Vertical -->
+            <div id="menu-list" class="custom-scrollbar pr-2">
+                <!-- Se poblará dinámicamente mediante JavaScript -->
+            </div>
+
+            <!-- Banner o Imagen Decorativa Dinámica Limpia (Debajo del Menú, sin disco ni textos extra) -->
+            <div class="relative w-full h-24 rounded overflow-hidden bg-black/60 shadow-lg">
+                <img id="menu-banner-img" src="" alt="Banner Decorativo" class="w-full h-full object-cover">
+            </div>
+
+        </aside>
+    </main>
+
+    <!-- FRANJA BLANCA INFERIOR DE DATOS DINÁMICOS -->
+    <footer class="relative z-20 px-4 md:px-12 pb-6">
+        <div class="bg-[#f4f4f4] text-black rounded-xl shadow-2xl p-4 md:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 backdrop-blur-md">
+            
+            <!-- SECCIÓN IZQUIERDA: Código de Catálogo y Título Destacado -->
+            <div class="flex flex-col justify-center min-w-[220px]">
+                <span id="data-catalog" class="font-mono font-bold text-sm text-gray-700 tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-barcode text-black"></i> MOPHRA017
+                </span>
+                <div class="bg-black text-white px-4 py-2 rounded mt-1 shadow-md flex items-center justify-between">
+                    <h2 id="data-title" class="font-black text-xl md:text-2xl tracking-wide uppercase truncate">
+                        UNDERCOVERRNB
+                    </h2>
+                </div>
+            </div>
+
+            <!-- SECCIÓN CENTRO/MEDIO: Contador de tracks, Botón VIEW NOW y Descripción -->
+            <div class="flex-grow flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-t md:border-t-0 md:border-l border-gray-300 pt-3 md:pt-0 md:pl-6">
+                
+                <!-- Track Count & Botón -->
+                <div class="flex md:flex-col items-center md:items-start justify-between w-full md:w-auto gap-2">
+                    <div>
+                        <span class="block text-xs font-bold uppercase text-gray-500 font-mono">contains</span>
+                        <span id="data-tracks" class="font-black text-lg md:text-xl leading-none text-black">17 tracks</span>
+                    </div>
+                    <button id="view-now-btn" class="bg-black hover:bg-neonPink text-white font-mono text-xs font-bold px-4 py-2 rounded tracking-widest transition-colors duration-200 flex items-center gap-2 shadow">
+                        <span>VIEW NOW</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+
+                <!-- Bloque con Descripción del Álbum -->
+                <div class="w-full md:max-w-md bg-white/80 p-3 rounded-lg border border-gray-200/80">
+                    <span class="text-[10px] font-mono text-gray-400 block font-bold uppercase mb-0.5">ALBUM DESCRIPTION</span>
+                    <p id="data-description" class="text-xs md:text-sm text-gray-700 leading-relaxed font-medium line-clamp-2 md:line-clamp-3">
+                        Edición especial que fusiona tonos R&B futuristas con ritmos nocturnos y sintetizadores profundos.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- SECCIÓN DERECHA: Imagen del Cover del Álbum (Limpia: sin bordes, sin overlays ni efectos hover) -->
+            <div class="flex items-center justify-end md:border-l border-gray-300 md:pl-6">
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden bg-gray-900 flex-shrink-0">
+                    <img id="data-cover-img" src="" alt="Album Cover" class="w-full h-full object-cover block">
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- LÓGICA JAVASCRIPT DINÁMICA -->
+    <script>
+        // Array de datos con las compilaciones del sello
+        const compilationsData = [
+            {
+                id: "MOPHRA017",
+                title: "UNDERCOVERRNB",
+                tracks: "17 tracks",
+                description: "Edición especial que fusiona tonos R&B futuristas con ritmos nocturnos y sintetizadores profundos.",
+                bgImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1600&auto=format&fit=crop",
+                bannerImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
+                coverImage: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=400&auto=format&fit=crop"
+            },
+            {
+                id: "MOPHRA018",
+                title: "USB HOT",
+                tracks: "12 tracks",
+                description: "Colección de bombas de club de archivo extraídas directamente de memorias USB perdidas en rave parties.",
+                bgImage: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop",
+                bannerImage: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=600&auto=format&fit=crop",
+                coverImage: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop"
+            },
+            {
+                id: "MOPHRA019",
+                title: "ACID RAGE 90",
+                tracks: "20 tracks",
+                description: "Sonidos analógicos distorsionados de sintetizadores TB-303 preparados para pistas de baile subterráneas.",
+                bgImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1600&auto=format&fit=crop",
+                bannerImage: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop",
+                coverImage: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=400&auto=format&fit=crop"
+            },
+            {
+                id: "MOPHRA020",
+                title: "NEO TOKYO DRIFT",
+                tracks: "15 tracks",
+                description: "Compilación Synthwave y Cyberpunk con sonidos inspirados en la estética japonesa de los 90.",
+                bgImage: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=1600&auto=format&fit=crop",
+                bannerImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop",
+                coverImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&auto=format&fit=crop"
+            },
+            {
+                id: "MOPHRA021",
+                title: "HYPERPOP HEAVEN",
+                tracks: "14 tracks",
+                description: "Vocales procesadas al límite con ritmos acelerados, bajos potentes y texturas brillantes.",
+                bgImage: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1600&auto=format&fit=crop",
+                bannerImage: "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop",
+                coverImage: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=400&auto=format&fit=crop"
+            },
+            {
+                id: "MOPHRA022",
+                title: "DARK AMBIENT III",
+                tracks: "09 tracks",
+                description: "Paisajes sonoros desolados, atmósferas envolventes y frecuencias graves para introspección profunda.",
+                bgImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop",
+                bannerImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop",
+                coverImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop"
+            }
+        ];
+
+        let currentIndex = 0;
+        let activeBgLayer = 1;
+
+        // Referencias al DOM
+        const menuList = document.getElementById('menu-list');
+        const counterEl = document.getElementById('compilation-counter');
+        const bgLayer1 = document.getElementById('bg-layer-1');
+        const bgLayer2 = document.getElementById('bg-layer-2');
+        
+        // Elementos de la franja blanca e imagen
+        const dataCatalog = document.getElementById('data-catalog');
+        const dataTitle = document.getElementById('data-title');
+        const dataTracks = document.getElementById('data-tracks');
+        const dataDescription = document.getElementById('data-description');
+        const dataCoverImg = document.getElementById('data-cover-img');
+        const menuBannerImg = document.getElementById('menu-banner-img');
+
+        // Inicializar el Menú Vertical (44px de alto exacto por bloque)
+        function renderMenu() {
+            menuList.innerHTML = '';
+            compilationsData.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = `menu-item w-full text-left px-4 bg-black/65 backdrop-blur-md border border-white/10 text-white font-mono text-sm tracking-wider uppercase flex items-center ${index === currentIndex ? 'active' : 'hover:bg-white/10'}`;
+                
+                btn.innerHTML = `<span class="truncate font-bold pointer-events-none pr-5">${item.title}</span>`;
+
+                btn.addEventListener('click', () => selectCompilation(index));
+                menuList.appendChild(btn);
+            });
+        }
+
+        // Función para cambiar suavemente el fondo
+        function updateBackground(newBgUrl) {
+            const currentLayer = activeBgLayer === 1 ? bgLayer1 : bgLayer2;
+            const nextLayer = activeBgLayer === 1 ? bgLayer2 : bgLayer1;
+
+            nextLayer.style.backgroundImage = `url('${newBgUrl}')`;
+            nextLayer.style.opacity = '1';
+            currentLayer.style.opacity = '0';
+
+            activeBgLayer = activeBgLayer === 1 ? 2 : 1;
+        }
+
+        // Función principal para cambiar la compilación activa
+        function selectCompilation(index) {
+            if (index < 0 || index >= compilationsData.length) return;
+            currentIndex = index;
+
+            const item = compilationsData[index];
+
+            // 1. Actualizar Menú
+            const menuButtons = menuList.querySelectorAll('.menu-item');
+            menuButtons.forEach((btn, idx) => {
+                if (idx === currentIndex) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Actualizar Contador
+            counterEl.textContent = `${String(currentIndex + 1).padStart(2, '0')} / ${String(compilationsData.length).padStart(2, '0')}`;
+
+            // 2. Actualizar Fondo
+            updateBackground(item.bgImage);
+
+            // 3. Actualizar Datos en Franja Blanca con animación fade
+            const animatedElements = [dataCatalog, dataTitle, dataTracks, dataDescription, dataCoverImg, menuBannerImg];
+            
+            animatedElements.forEach(el => el.classList.remove('fade-in-element'));
+            
+            // Forzar reflow para reiniciar la animación CSS
+            void dataTitle.offsetWidth;
+
+            dataCatalog.innerHTML = `<i class="fa-solid fa-barcode text-black"></i> ${item.id}`;
+            dataTitle.textContent = item.title;
+            dataTracks.textContent = item.tracks;
+            dataDescription.textContent = item.description;
+            dataCoverImg.src = item.coverImage;
+            menuBannerImg.src = item.bannerImage;
+
+            animatedElements.forEach(el => el.classList.add('fade-in-element'));
+        }
+
+        // Inicialización al cargar la página
+        window.onload = function() {
+            bgLayer1.style.backgroundImage = `url('${compilationsData[0].bgImage}')`;
+            renderMenu();
+            selectCompilation(0);
+        };
+
+        // --- LÓGICA DEL MENÚ GLOBAL MOPHRA ---
+        (function() {
+            const PATH_LOGO = "M486.86,74.1l43.7.72c315.79,23.24,500.51,374.15,332.93,647.91-158.69,259.22-531.3,272.98-709.23,26.4C-45.68,472.05,147.58,85.24,486.86,74.1ZM901.07,465.81c-8.75-115.9-71.16-224.09-164.68-291.82-181.81-131.66-436.09-88.78-565.13,93.5-40.96,57.86-66.79,127.33-72.19,198.31h239.5l90,89.98,54.06-53.99-123.49-126.35,137.92-138.24,3.93-.93,140.01,139.17-123.49,126.35,53.92,52.94,89.14-88.93h240.5ZM499.7,267.88l-107.56,108.29,108.29,107.56,107.56-108.29-108.29-107.56ZM240.07,489.81H98.07c-2.86,10.5.77,21.33,0,32h110.5l31.5-32ZM297.07,489.81h-23.5l-31.5,32h23.5l31.5-32ZM757.07,521.81l-31.5-32h-23.5l32.5,32h22.5ZM902.07,489.81h-143l31.5,32h111.5c-.77-10.67,2.86-21.5,0-32ZM187.07,577.81h85.5l71.03-71.02c.78-1.08.51-1.86,0-2.96-.39-.84-12.26-12.79-13.17-12.95l-54.38,53.41-57.28.72c-2.03.6-27.76,26.59-30.21,29.79-.77,1.01-1.93,1.26-1.49,3.01ZM813.07,577.81l-32.7-32.8-56.28-.72-55.38-53.41c-.91.16-12.78,12.11-13.17,12.95-.51,1.1-.78,1.88,0,2.96l71.03,71.02h86.5ZM710.9,843.65l-.36-115.82-210.12-209.95-210.16,209.63.3,116.29c102.67,64.08,233.16,76.11,347.01,35.03,25.59-9.24,49.76-21.75,73.32-35.18ZM131.07,632.81h144.5l98.48-98.5-12.48-12.48-78.52,78.46-119.46.54-32.52,31.98ZM868.07,632.81l-32.52-31.98-119.46-.54-78.52-78.46c-2.2,3.31-12.84,10.05-11.03,13.96l97.03,97.02h144.5ZM185.07,544.81h-85l4.88,32.42,47.41.37,32.7-32.8ZM900.07,544.81h-86l32.7,32.8,48.41-.37,4.88-32.42ZM871.07,656.81h-156.5l-106-105.98-20.43,21.34,145.93,146.14v109.5c60.22-42.95,108.18-102.77,137-171ZM266.07,827.81v-109.5l145.98-146-21.48-20.54-106,105.04h-155.5c28.8,68.24,76.78,128.03,137,171ZM129.07,600.81h-19l4.01,15,14.99-15ZM890.07,600.81h-20l15.99,16,4.01-16Z";
+            const PATH_X = "M500,50 C251.5,50 50,251.5 50,500 C50,748.5 251.5,950 500,950 C748.5,950 950,748.5 950,500 C950,251.5 748.5,50 500,50 Z M500,120 C709.9,120 880,290.1 880,500 C880,709.9 709.9,880 500,880 C290.1,880 120,709.9 120,500 C120,290.1 290.1,120 500,120 Z M330,260 L260,330 L430,500 L260,670 L330,740 L500,570 L670,740 L740,670 L570,500 L740,330 L670,260 L500,430 Z";
+
+            function initMenu() {
+                const menu = document.getElementById('mophraGlobalMenu');
+                if (!menu) return;
+                if (document.body && menu.parentElement !== document.body) document.body.appendChild(menu);
+
+                const toggleBtn = menu.querySelector('.mophra-global-btn');
+                const vectorPath = document.getElementById('mophraVectorPath');
+                const overlay = menu.querySelector('.mophra-global-overlay');
+                const navLinks = menu.querySelectorAll('.mophra-sign-link, a.mophra-sign-item, .mophra-sub-item');
+                const relToggle = document.getElementById('mophraReleasesToggle');
+                const relWrap = relToggle ? relToggle.closest('.mophra-dropdown-wrapper') : null;
+
+                if (!toggleBtn || !vectorPath) return;
+
+                function abrirMenu() {
+                    menu.classList.add('menu-open');
+                    setTimeout(() => vectorPath.setAttribute('d', PATH_X), 200);
+                }
+
+                function cerrarMenu() {
+                    if (!menu.classList.contains('menu-open')) return;
+                    menu.classList.remove('menu-open');
+                    if (relWrap) relWrap.classList.remove('submenu-open');
+                    setTimeout(() => vectorPath.setAttribute('d', PATH_LOGO), 200);
+                }
+
+                if (relToggle && relWrap) {
+                    relToggle.onclick = (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        relWrap.classList.toggle('submenu-open');
+                    };
+                }
+
+                toggleBtn.onclick = (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    menu.classList.contains('menu-open') ? cerrarMenu() : abrirMenu();
+                };
+
+                if (overlay) overlay.onclick = (e) => { e.stopPropagation(); cerrarMenu(); };
+                navLinks.forEach(l => l.onclick = () => cerrarMenu());
+
+                let timer;
+                function animar() {
+                    cerrarMenu(); clearTimeout(timer);
+                    if (toggleBtn.classList.contains('animar-entrada')) {
+                        toggleBtn.classList.remove('animar-entrada');
+                        toggleBtn.classList.add('animar-salida');
+                        timer = setTimeout(() => {
+                            toggleBtn.classList.remove('animar-salida');
+                            void toggleBtn.offsetWidth;
+                            toggleBtn.classList.add('animar-entrada');
+                        }, 450);
+                    } else {
+                        timer = setTimeout(() => { void toggleBtn.offsetWidth; toggleBtn.classList.add('animar-entrada'); }, 400);
+                    }
+                }
+
+                window.addEventListener('popstate', animar);
+                animar();
+            }
+
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMenu);
+            else initMenu();
+        })();
+
+        // --- LÓGICA DE LA CORTINA METÁLICA DE TRANSICIÓN ---
+        (function() {
+            const cortina = document.getElementById('cortina-transicion');
+
+            function abrirCortina() {
+                if (cortina) {
+                    cortina.classList.remove('cerrar');
+                    cortina.classList.add('abrir');
+                }
+            }
+
+            window.addEventListener('load', () => {
+                setTimeout(abrirCortina, 100);
+            });
+
+            window.addEventListener('pageshow', (event) => {
+                if (event.persisted && cortina) {
+                    cortina.classList.remove('cerrar');
+                    cortina.classList.add('abrir');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (!link) return;
+
+                const href = link.getAttribute('href');
+                if (href && (href.startsWith('/') || href.startsWith('.')) && !link.getAttribute('target') && !link.hasAttribute('download')) {
+                    e.preventDefault();
+                    
+                    if (cortina) {
+                        cortina.classList.remove('abrir');
+                        cortina.classList.add('cerrar');
+                    }
+
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 500);
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
