@@ -56,10 +56,13 @@
         body {
             font-family: 'Chakra Petch', sans-serif;
             background-color: #0b0b0e;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             user-select: none;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
         }
 
         /* --- EFECTO TYPEWRITER CENTRADO PARA TÍTULO 'compilations' (12 letras = 12 pasos) --- */
@@ -164,7 +167,7 @@
             object-fit: cover;
         }
 
-        /* --- ESTILOS MENÚ GLOBAL MOPHRA --- */
+    <style>
         .mophra-global-container {
             position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
             width: 100% !important; height: 100vh !important;
@@ -416,9 +419,9 @@
                 height: 52px !important;
             }
 
-            /* Franja inferior transparente con blur sutil y espacio seguro para barra de Safari */
+            /* Franja inferior transparente con blur sutil y espacio seguro para barra de navegadores móviles */
             #mobile-footer-wrapper {
-                padding-bottom: calc(18px + env(safe-area-inset-bottom, 20px)) !important;
+                padding-bottom: calc(40px + env(safe-area-inset-bottom, 30px)) !important;
             }
             #data-glass-card {
                 background-color: rgba(255, 255, 255, 0.24) !important;
@@ -446,16 +449,16 @@
         }
     </style>
 </head>
-<body class="h-screen w-screen relative overflow-hidden text-white flex flex-col justify-between">
+<body class="w-full relative text-white flex flex-col justify-between">
 
     <!-- Capa de Fondo 1 (Imagen principal activa) -->
-    <div id="bg-layer-1" class="bg-layer absolute inset-0 bg-cover bg-center z-0 opacity-100"></div>
+    <div id="bg-layer-1" class="bg-layer fixed inset-0 bg-cover bg-center z-0 opacity-100"></div>
     <!-- Capa de Fondo 2 (Para transición suave entre imágenes) -->
-    <div id="bg-layer-2" class="bg-layer absolute inset-0 bg-cover bg-center z-0 opacity-0"></div>
+    <div id="bg-layer-2" class="bg-layer fixed inset-0 bg-cover bg-center z-0 opacity-0"></div>
 
     <!-- Overlay de Gradiente Magenta/Oscuro y Scanlines -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/60 z-0 pointer-events-none"></div>
-    <div class="absolute inset-0 scanline z-0 pointer-events-none opacity-40"></div>
+    <div class="fixed inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/60 z-0 pointer-events-none"></div>
+    <div class="fixed inset-0 scanline z-0 pointer-events-none opacity-40"></div>
 
     <!-- CORTINA METÁLICA DE TRANSICIÓN -->
     <div id="cortina-transicion" class="cortina-contenedor">
