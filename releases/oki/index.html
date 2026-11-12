@@ -430,6 +430,19 @@
                 background-color: rgba(255, 255, 255, 0.20) !important;
                 border-color: rgba(255, 255, 255, 0.3) !important;
             }
+            /* Textos en blanco total en vista móvil */
+            #data-catalog,
+            #data-catalog i,
+            #data-contains-label,
+            #data-tracks,
+            #data-desc-label,
+            #data-description {
+                color: #ffffff !important;
+            }
+            #data-contains-label,
+            #data-desc-label {
+                opacity: 0.85;
+            }
         }
     </style>
 </head>
@@ -530,36 +543,41 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN CENTRO/MEDIO: Contador de tracks, Botón VIEW NOW y Descripción -->
-            <div class="flex-grow flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-4 border-t md:border-t-0 md:border-l border-gray-400/50 pt-3 md:pt-0 md:pl-6">
+            <!-- SECCIÓN CENTRO/MEDIO Y DERECHA: Tracks, View Now, Descripción (50% en móvil) y Cover (50% en móvil) -->
+            <div class="flex-grow flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-6 border-t md:border-t-0 md:border-l border-gray-400/50 pt-3 md:pt-0 md:pl-6">
                 
-                <!-- Track Count & Botón -->
-                <div class="flex md:flex-col items-center md:items-start justify-between w-full md:w-auto gap-2">
+                <!-- Track Count & Botón VIEW NOW Clicable -->
+                <div class="flex md:flex-col items-center md:items-start justify-between w-full md:w-auto gap-2 flex-shrink-0">
                     <div>
-                        <span class="block text-xs font-bold uppercase text-gray-600 font-mono">contains</span>
+                        <span id="data-contains-label" class="block text-xs font-bold uppercase text-gray-600 font-mono">contains</span>
                         <span id="data-tracks" class="font-black text-lg md:text-xl leading-none text-black">17 tracks</span>
                     </div>
-                    <button id="view-now-btn" class="bg-black hover:bg-neonPink text-white font-mono text-xs font-bold px-4 py-2 rounded tracking-widest transition-colors duration-200 flex items-center gap-2 shadow">
+                    <a id="view-now-btn" href="/releases/compilations/undercoverrnb/" class="bg-black hover:bg-neonPink text-white font-mono text-xs font-bold px-4 py-2 rounded tracking-widest transition-colors duration-200 flex items-center gap-2 shadow cursor-pointer">
                         <span>VIEW NOW</span>
                         <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                    </button>
+                    </a>
                 </div>
 
-                <!-- Bloque con Descripción del Álbum -->
-                <div id="data-description-box" class="w-full md:max-w-md bg-white/80 p-3 rounded-lg border border-gray-200/80">
-                    <span class="text-[10px] font-mono text-gray-500 block font-bold uppercase mb-0.5">ALBUM DESCRIPTION</span>
-                    <p id="data-description" class="text-xs md:text-sm text-gray-800 leading-relaxed font-medium line-clamp-2 md:line-clamp-3">
-                        Edición especial que fusiona tonos R&B futuristas con ritmos nocturnos y sintetizadores profundos.
-                    </p>
+                <!-- Contenedor 50% Descripción / 50% Cover en Móvil; fila limpia en Escritorio -->
+                <div class="grid grid-cols-2 md:flex md:flex-row items-stretch md:items-center gap-3 md:gap-6 flex-grow justify-end">
+                    
+                    <!-- Mitad Izquierda (50% en móvil): Bloque con Descripción del Álbum -->
+                    <div id="data-description-box" class="w-full md:max-w-md bg-white/80 p-3 rounded-lg border border-gray-200/80 flex flex-col justify-center">
+                        <span id="data-desc-label" class="text-[10px] font-mono text-gray-500 block font-bold uppercase mb-0.5">ALBUM DESCRIPTION</span>
+                        <p id="data-description" class="text-xs md:text-sm text-gray-800 leading-relaxed font-medium line-clamp-3">
+                            Edición especial que fusiona tonos R&B futuristas con ritmos nocturnos y sintetizadores profundos.
+                        </p>
+                    </div>
+
+                    <!-- Mitad Derecha (50% en móvil): Imagen del Cover del Álbum -->
+                    <div class="w-full md:w-auto flex items-center justify-center md:justify-end md:border-l border-gray-400/50 md:pl-6">
+                        <div class="w-full aspect-square max-w-[125px] md:max-w-none md:w-20 md:h-20 rounded-md overflow-hidden bg-gray-900 flex-shrink-0">
+                            <img id="data-cover-img" src="" alt="Album Cover" class="w-full h-full object-cover block">
+                        </div>
+                    </div>
+
                 </div>
 
-            </div>
-
-            <!-- SECCIÓN DERECHA: Imagen del Cover del Álbum (Limpia: sin bordes, sin overlays ni efectos hover) -->
-            <div class="flex items-center justify-end md:border-l border-gray-400/50 md:pl-6">
-                <div class="w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden bg-gray-900 flex-shrink-0">
-                    <img id="data-cover-img" src="" alt="Album Cover" class="w-full h-full object-cover block">
-                </div>
             </div>
 
         </div>
@@ -573,6 +591,7 @@
                 id: "MOPHRA017",
                 title: "UNDERCOVERRNB",
                 tracks: "17 tracks",
+                url: "/releases/compilations/undercoverrnb/",
                 description: "Edición especial que fusiona tonos R&B futuristas con ritmos nocturnos y sintetizadores profundos.",
                 bgImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1600&auto=format&fit=crop",
                 bannerImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
@@ -582,6 +601,7 @@
                 id: "MOPHRA018",
                 title: "USB HOT",
                 tracks: "12 tracks",
+                url: "/releases/compilations/usb-hot/",
                 description: "Colección de bombas de club de archivo extraídas directamente de memorias USB perdidas en rave parties.",
                 bgImage: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop",
                 bannerImage: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=600&auto=format&fit=crop",
@@ -591,6 +611,7 @@
                 id: "MOPHRA019",
                 title: "ACID RAGE 90",
                 tracks: "20 tracks",
+                url: "/releases/compilations/acid-rage-90/",
                 description: "Sonidos analógicos distorsionados de sintetizadores TB-303 preparados para pistas de baile subterráneas.",
                 bgImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1600&auto=format&fit=crop",
                 bannerImage: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop",
@@ -600,6 +621,7 @@
                 id: "MOPHRA020",
                 title: "NEO TOKYO DRIFT",
                 tracks: "15 tracks",
+                url: "/releases/compilations/neo-tokyo-drift/",
                 description: "Compilación Synthwave y Cyberpunk con sonidos inspirados en la estética japonesa de los 90.",
                 bgImage: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=1600&auto=format&fit=crop",
                 bannerImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop",
@@ -609,6 +631,7 @@
                 id: "MOPHRA021",
                 title: "HYPERPOP HEAVEN",
                 tracks: "14 tracks",
+                url: "/releases/compilations/hyperpop-heaven/",
                 description: "Vocales procesadas al límite con ritmos acelerados, bajos potentes y texturas brillantes.",
                 bgImage: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1600&auto=format&fit=crop",
                 bannerImage: "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop",
@@ -618,6 +641,7 @@
                 id: "MOPHRA022",
                 title: "DARK AMBIENT III",
                 tracks: "09 tracks",
+                url: "/releases/compilations/dark-ambient-iii/",
                 description: "Paisajes sonoros desolados, atmósferas envolventes y frecuencias graves para introspección profunda.",
                 bgImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop",
                 bannerImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop",
@@ -639,6 +663,7 @@
         const dataTracks = document.getElementById('data-tracks');
         const dataDescription = document.getElementById('data-description');
         const dataCoverImg = document.getElementById('data-cover-img');
+        const viewNowBtn = document.getElementById('view-now-btn');
 
         // Inicializar el Menú Vertical (PC) / Horizontal (Móvil)
         function renderMenu() {
@@ -714,13 +739,13 @@
             
             // Forzar reflow para reiniciar la animación CSS
             void dataTitle.offsetWidth;
-
-            dataCatalog.innerHTML = `<i class="fa-solid fa-barcode text-black"></i> ${item.id}`;
+            dataCatalog.innerHTML = `<i class="fa-solid fa-barcode"></i> ${item.id}`;
             dataTitle.textContent = item.title;
             dataTracks.textContent = item.tracks;
             dataDescription.textContent = item.description;
             dataCoverImg.src = item.coverImage;
             menuBannerImg.src = item.bannerImage;
+            if (viewNowBtn) viewNowBtn.setAttribute('href', item.url);
 
             animatedElements.forEach(el => el.classList.add('fade-in-element'));
         }
