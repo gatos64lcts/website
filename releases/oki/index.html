@@ -368,6 +368,63 @@
             );
             background-size: 100% 4px;
         }
+
+        /* --- AJUSTES EXCLUSIVOS PARA MÓVIL (< 768px) --- */
+        @media (max-width: 767px) {
+            /* Posicionar el área del selector arriba dejando todo el centro libre para el background */
+            #main-selector-area {
+                align-items: flex-start !important;
+                padding-top: 10px !important;
+            }
+
+            /* Menú horizontal mostrando 1 bloque a la vez con scroll-snap */
+            #menu-list {
+                height: auto !important;
+                flex-direction: row !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                scroll-snap-type: x mandatory !important;
+                scroll-behavior: smooth !important;
+                gap: 10px !important;
+                padding-right: 0 !important;
+                padding-bottom: 4px !important;
+                scrollbar-width: none; /* Firefox */
+            }
+            #menu-list::-webkit-scrollbar {
+                display: none; /* Chrome / Safari */
+            }
+
+            .menu-item {
+                min-width: 100% !important;
+                width: 100% !important;
+                scroll-snap-align: center !important;
+                scroll-snap-stop: always !important;
+            }
+            .menu-item.active {
+                transform: none !important;
+                box-shadow: 0 0 14px rgba(255, 0, 85, 0.65) !important;
+            }
+
+            /* Banner decorativo más compacto en móvil para dar aire al fondo */
+            #menu-banner-container {
+                height: 52px !important;
+            }
+
+            /* Franja inferior transparente con blur y espacio seguro para barra de Safari */
+            #mobile-footer-wrapper {
+                padding-bottom: calc(18px + env(safe-area-inset-bottom, 20px)) !important;
+            }
+            #data-glass-card {
+                background-color: rgba(255, 255, 255, 0.68) !important;
+                backdrop-filter: blur(14px) !important;
+                -webkit-backdrop-filter: blur(14px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.45) !important;
+            }
+            #data-description-box {
+                background-color: rgba(255, 255, 255, 0.52) !important;
+                border-color: rgba(255, 255, 255, 0.4) !important;
+            }
+        }
     </style>
 </head>
 <body class="h-screen w-screen relative overflow-hidden text-white flex flex-col justify-between">
@@ -429,23 +486,23 @@
     </header>
 
     <!-- ÁREA CENTRAL CON MENÚ Y BANNER A LA DERECHA -->
-    <main class="relative z-10 flex-grow flex justify-end items-center px-4 md:px-12 py-2">
+    <main id="main-selector-area" class="relative z-10 flex-grow flex justify-end items-center px-4 md:px-12 py-2">
         
-        <!-- Menú Contenedor (Lado Derecho) -->
-        <aside class="w-full max-w-xs md:max-w-sm flex flex-col gap-3.5">
+        <!-- Menú Contenedor (Lado Derecho en PC / Superior Compacto en Móvil) -->
+        <aside class="w-full max-w-full md:max-w-sm flex flex-col gap-2.5 md:gap-3.5">
             
             <div class="flex items-center justify-between text-xs font-mono text-gray-300 bg-black/75 px-3 py-1.5 rounded border-l-2 border-neonPink backdrop-blur-sm">
-                <span class="uppercase tracking-wider">SELECT COMPILATION</span>
+                <span class="uppercase tracking-wider">SELECT COMPILATION <span class="md:hidden text-[10px] text-gray-400 ml-1">(SWIPE)</span></span>
                 <span id="compilation-counter">01 / 06</span>
             </div>
 
-            <!-- Menú de ítems: Estrictamente 4 visibles + Scrollbar Vertical -->
+            <!-- Menú de ítems: 4 visibles en PC / 1 horizontal en Móvil -->
             <div id="menu-list" class="custom-scrollbar pr-2">
                 <!-- Se poblará dinámicamente mediante JavaScript -->
             </div>
 
             <!-- Banner o Imagen Decorativa Dinámica Limpia (Debajo del Menú, sin disco ni textos extra) -->
-            <div class="relative w-full h-24 rounded overflow-hidden bg-black/60 shadow-lg">
+            <div id="menu-banner-container" class="relative w-full h-24 rounded overflow-hidden bg-black/60 shadow-lg">
                 <img id="menu-banner-img" src="" alt="Banner Decorativo" class="w-full h-full object-cover">
             </div>
 
@@ -453,12 +510,12 @@
     </main>
 
     <!-- FRANJA BLANCA INFERIOR DE DATOS DINÁMICOS -->
-    <footer class="relative z-20 px-4 md:px-12 pb-6">
-        <div class="bg-[#f4f4f4] text-black rounded-xl shadow-2xl p-4 md:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 backdrop-blur-md">
+    <footer id="mobile-footer-wrapper" class="relative z-20 px-4 md:px-12 pb-6">
+        <div id="data-glass-card" class="bg-[#f4f4f4] text-black rounded-xl shadow-2xl p-4 md:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-4 backdrop-blur-md">
             
             <!-- SECCIÓN IZQUIERDA: Código de Catálogo y Título Destacado -->
             <div class="flex flex-col justify-center min-w-[220px]">
-                <span id="data-catalog" class="font-mono font-bold text-sm text-gray-700 tracking-wider flex items-center gap-1.5">
+                <span id="data-catalog" class="font-mono font-bold text-sm text-gray-800 tracking-wider flex items-center gap-1.5">
                     <i class="fa-solid fa-barcode text-black"></i> MOPHRA017
                 </span>
                 <div class="bg-black text-white px-4 py-2 rounded mt-1 shadow-md flex items-center justify-between">
@@ -469,12 +526,12 @@
             </div>
 
             <!-- SECCIÓN CENTRO/MEDIO: Contador de tracks, Botón VIEW NOW y Descripción -->
-            <div class="flex-grow flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-t md:border-t-0 md:border-l border-gray-300 pt-3 md:pt-0 md:pl-6">
+            <div class="flex-grow flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-4 border-t md:border-t-0 md:border-l border-gray-400/50 pt-3 md:pt-0 md:pl-6">
                 
                 <!-- Track Count & Botón -->
                 <div class="flex md:flex-col items-center md:items-start justify-between w-full md:w-auto gap-2">
                     <div>
-                        <span class="block text-xs font-bold uppercase text-gray-500 font-mono">contains</span>
+                        <span class="block text-xs font-bold uppercase text-gray-600 font-mono">contains</span>
                         <span id="data-tracks" class="font-black text-lg md:text-xl leading-none text-black">17 tracks</span>
                     </div>
                     <button id="view-now-btn" class="bg-black hover:bg-neonPink text-white font-mono text-xs font-bold px-4 py-2 rounded tracking-widest transition-colors duration-200 flex items-center gap-2 shadow">
@@ -484,9 +541,9 @@
                 </div>
 
                 <!-- Bloque con Descripción del Álbum -->
-                <div class="w-full md:max-w-md bg-white/80 p-3 rounded-lg border border-gray-200/80">
-                    <span class="text-[10px] font-mono text-gray-400 block font-bold uppercase mb-0.5">ALBUM DESCRIPTION</span>
-                    <p id="data-description" class="text-xs md:text-sm text-gray-700 leading-relaxed font-medium line-clamp-2 md:line-clamp-3">
+                <div id="data-description-box" class="w-full md:max-w-md bg-white/80 p-3 rounded-lg border border-gray-200/80">
+                    <span class="text-[10px] font-mono text-gray-500 block font-bold uppercase mb-0.5">ALBUM DESCRIPTION</span>
+                    <p id="data-description" class="text-xs md:text-sm text-gray-800 leading-relaxed font-medium line-clamp-2 md:line-clamp-3">
                         Edición especial que fusiona tonos R&B futuristas con ritmos nocturnos y sintetizadores profundos.
                     </p>
                 </div>
@@ -494,7 +551,7 @@
             </div>
 
             <!-- SECCIÓN DERECHA: Imagen del Cover del Álbum (Limpia: sin bordes, sin overlays ni efectos hover) -->
-            <div class="flex items-center justify-end md:border-l border-gray-300 md:pl-6">
+            <div class="flex items-center justify-end md:border-l border-gray-400/50 md:pl-6">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden bg-gray-900 flex-shrink-0">
                     <img id="data-cover-img" src="" alt="Album Cover" class="w-full h-full object-cover block">
                 </div>
@@ -559,28 +616,27 @@
                 description: "Paisajes sonoros desolados, atmósferas envolventes y frecuencias graves para introspección profunda.",
                 bgImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop",
                 bannerImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop",
-                coverImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop"
+                coverImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=400&auto=format&fit=crop"
             }
         ];
 
+        // Variables de estado y referencias al DOM
         let currentIndex = 0;
         let activeBgLayer = 1;
 
-        // Referencias al DOM
-        const menuList = document.getElementById('menu-list');
-        const counterEl = document.getElementById('compilation-counter');
         const bgLayer1 = document.getElementById('bg-layer-1');
         const bgLayer2 = document.getElementById('bg-layer-2');
-        
-        // Elementos de la franja blanca e imagen
+        const menuList = document.getElementById('menu-list');
+        const counterEl = document.getElementById('compilation-counter');
+        const menuBannerImg = document.getElementById('menu-banner-img');
+
         const dataCatalog = document.getElementById('data-catalog');
         const dataTitle = document.getElementById('data-title');
         const dataTracks = document.getElementById('data-tracks');
         const dataDescription = document.getElementById('data-description');
         const dataCoverImg = document.getElementById('data-cover-img');
-        const menuBannerImg = document.getElementById('menu-banner-img');
 
-        // Inicializar el Menú Vertical (44px de alto exacto por bloque)
+        // Inicializar el Menú Vertical (PC) / Horizontal (Móvil)
         function renderMenu() {
             menuList.innerHTML = '';
             compilationsData.forEach((item, index) => {
@@ -593,6 +649,22 @@
                 menuList.appendChild(btn);
             });
         }
+
+        // Detectar swipe horizontal en móvil y actualizar compilación activa automáticamente
+        let scrollTimeout;
+        menuList.addEventListener('scroll', () => {
+            if (window.innerWidth >= 768) return; // Solo aplica en móvil
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                const itemWidth = menuList.clientWidth + 10; // Ancho del bloque + gap de 10px
+                if (itemWidth > 0) {
+                    const newIndex = Math.round(menuList.scrollLeft / itemWidth);
+                    if (newIndex !== currentIndex && newIndex >= 0 && newIndex < compilationsData.length) {
+                        selectCompilation(newIndex, false);
+                    }
+                }
+            }, 60);
+        });
 
         // Función para cambiar suavemente el fondo
         function updateBackground(newBgUrl) {
@@ -607,7 +679,7 @@
         }
 
         // Función principal para cambiar la compilación activa
-        function selectCompilation(index) {
+        function selectCompilation(index, syncScroll = true) {
             if (index < 0 || index >= compilationsData.length) return;
             currentIndex = index;
 
@@ -622,6 +694,11 @@
                     btn.classList.remove('active');
                 }
             });
+
+            // Sincronizar posición horizontal en móvil si se seleccionó por clic
+            if (syncScroll && window.innerWidth < 768 && menuButtons[currentIndex]) {
+                menuButtons[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
 
             // Actualizar Contador
             counterEl.textContent = `${String(currentIndex + 1).padStart(2, '0')} / ${String(compilationsData.length).padStart(2, '0')}`;
