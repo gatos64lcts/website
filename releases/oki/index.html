@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MOPHRA | Compilations</title>
+    <link rel="icon" type="image/png" href="/icon.png">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -397,8 +398,13 @@
             .menu-item {
                 min-width: 100% !important;
                 width: 100% !important;
+                justify-content: center !important;
+                text-align: center !important;
                 scroll-snap-align: center !important;
                 scroll-snap-stop: always !important;
+            }
+            .menu-item span {
+                padding-right: 0 !important;
             }
             .menu-item.active {
                 transform: none !important;
@@ -410,18 +416,18 @@
                 height: 52px !important;
             }
 
-            /* Franja inferior transparente con blur y espacio seguro para barra de Safari */
+            /* Franja inferior transparente con blur sutil y espacio seguro para barra de Safari */
             #mobile-footer-wrapper {
                 padding-bottom: calc(18px + env(safe-area-inset-bottom, 20px)) !important;
             }
             #data-glass-card {
-                background-color: rgba(255, 255, 255, 0.28) !important;
-                backdrop-filter: blur(8px) !important;
-                -webkit-backdrop-filter: blur(8px) !important;
+                background-color: rgba(255, 255, 255, 0.24) !important;
+                backdrop-filter: blur(3px) !important;
+                -webkit-backdrop-filter: blur(3px) !important;
                 border: 1px solid rgba(255, 255, 255, 0.35) !important;
             }
             #data-description-box {
-                background-color: rgba(255, 255, 255, 0.22) !important;
+                background-color: rgba(255, 255, 255, 0.20) !important;
                 border-color: rgba(255, 255, 255, 0.3) !important;
             }
         }
@@ -491,9 +497,8 @@
         <!-- Menú Contenedor (Lado Derecho en PC / Superior Compacto en Móvil) -->
         <aside class="w-full max-w-full md:max-w-sm flex flex-col gap-2.5 md:gap-3.5">
             
-            <div class="flex items-center justify-between text-xs font-mono text-gray-300 bg-black/75 px-3 py-1.5 rounded border-l-2 border-neonPink backdrop-blur-sm">
-                <span class="uppercase tracking-wider">SELECT COMPILATION <span class="md:hidden text-[10px] text-gray-400 ml-1">(SWIPE)</span></span>
-                <span id="compilation-counter">01 / 06</span>
+            <div class="flex items-center justify-center text-xs font-mono text-gray-300 bg-black/75 px-3 py-1.5 rounded border-l-2 border-neonPink backdrop-blur-sm">
+                <span class="uppercase tracking-wider text-center">SELECT COMPILATION</span>
             </div>
 
             <!-- Menú de ítems: 4 visibles en PC / 1 horizontal en Móvil -->
@@ -627,7 +632,6 @@
         const bgLayer1 = document.getElementById('bg-layer-1');
         const bgLayer2 = document.getElementById('bg-layer-2');
         const menuList = document.getElementById('menu-list');
-        const counterEl = document.getElementById('compilation-counter');
         const menuBannerImg = document.getElementById('menu-banner-img');
 
         const dataCatalog = document.getElementById('data-catalog');
@@ -699,9 +703,6 @@
             if (syncScroll && window.innerWidth < 768 && menuButtons[currentIndex]) {
                 menuButtons[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
-
-            // Actualizar Contador
-            counterEl.textContent = `${String(currentIndex + 1).padStart(2, '0')} / ${String(compilationsData.length).padStart(2, '0')}`;
 
             // 2. Actualizar Fondo
             updateBackground(item.bgImage);
