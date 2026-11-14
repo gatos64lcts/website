@@ -288,7 +288,7 @@
             .mophra-dropdown-wrapper.submenu-open .mophra-frolov-icon .line-bot { transform: translateY(-8.5px) rotate(-45deg) !important; }
         }
 
-        /* --- SCROLLBAR Y BLOQUES DEL MENÚ DERECHO (4 ELEMENTOS EXACTOS) --- */
+        /* --- SCROLLBAR Y BLOQUES DEL MENÚ (4 ELEMENTOS EXACTOS) --- */
         .custom-scrollbar::-webkit-scrollbar {
             width: 5px;
         }
@@ -316,23 +316,35 @@
             box-sizing: border-box;
         }
 
-        /* Bloque rectangular limpio sin cortes diagonales */
+        /* Bloque rectangular con desenfoque (blur) para ítems no seleccionados */
         .menu-item {
             height: 44px;
             min-height: 44px;
             max-height: 44px;
             flex-shrink: 0;
-            transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, backdrop-filter 0.2s ease;
             position: relative;
             border-radius: 4px;
             box-sizing: border-box;
+            background-color: rgba(15, 15, 20, 0.45) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
         }
+
+        .menu-item:hover {
+            background-color: rgba(30, 30, 40, 0.6) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
         .menu-item.active {
-            background-color: #ff0055;
-            border-color: #ff0055;
-            color: #ffffff;
-            transform: translateX(-5px);
-            box-shadow: -4px 0 14px rgba(255, 0, 85, 0.65);
+            background-color: #ff0055 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border-color: #ff0055 !important;
+            color: #ffffff !important;
+            transform: translateX(5px);
+            box-shadow: 4px 0 14px rgba(255, 0, 85, 0.65);
         }
         .menu-item.active::after {
             content: '';
@@ -414,11 +426,17 @@
             background-size: 100% 4px;
         }
 
+        /* --- POSICIÓN EXACTA DEL MENÚ DE COMPILACIONES --- */
+        #main-selector-area {
+            align-items: flex-start;
+            padding-top: 25px; /* Sube el menú dejando margen limpio debajo del botón circular */
+        }
+
         /* --- AJUSTES EXCLUSIVOS PARA MÓVIL (< 768px) --- */
         @media (max-width: 767px) {
             #main-selector-area {
                 align-items: flex-start !important;
-                padding-top: 10px !important;
+                padding-top: 6px !important;
             }
 
             #menu-list {
@@ -543,11 +561,11 @@
         <h1 class="mophra-typewriter-compilations">compilations</h1>
     </header>
 
-    <!-- ÁREA CENTRAL CON MENÚ Y BANNER A LA DERECHA -->
-    <main id="main-selector-area" class="relative z-10 flex-grow flex justify-end items-center px-4 md:px-12 py-2">
+    <!-- ÁREA CENTRAL CON MENÚ A LA IZQUIERDA Y SEPARADO DEL BOTÓN SUPERIOR -->
+    <main id="main-selector-area" class="relative z-10 flex-grow flex justify-start px-4 md:px-12 pb-2">
         
-        <!-- Menú Contenedor (Lado Derecho en PC / Superior Compacto en Móvil) -->
-        <aside class="w-full max-w-full md:max-w-sm flex flex-col gap-2.5 md:gap-3.5">
+        <!-- Menú Contenedor (Lado Izquierdo en PC / Menos largo) -->
+        <aside class="w-full max-w-full md:max-w-xs flex flex-col gap-2.5 md:gap-3.5">
             
             <div class="flex items-center justify-center text-xs font-mono text-gray-300 bg-black/75 px-3 py-1.5 rounded border-l-2 border-neonPink backdrop-blur-sm">
                 <span class="uppercase tracking-wider text-center">SELECT COMPILATION</span>
@@ -709,7 +727,7 @@
             menuList.innerHTML = '';
             compilationsData.forEach((item, index) => {
                 const btn = document.createElement('button');
-                btn.className = `menu-item w-full text-left px-4 bg-black/65 backdrop-blur-md border border-white/10 text-white font-mono text-sm tracking-wider uppercase flex items-center ${index === currentIndex ? 'active' : 'hover:bg-white/10'}`;
+                btn.className = `menu-item w-full text-left px-4 text-white font-mono text-sm tracking-wider uppercase flex items-center ${index === currentIndex ? 'active' : ''}`;
                 
                 btn.innerHTML = `<span class="truncate font-bold pointer-events-none pr-5">${item.title}</span>`;
 
@@ -801,7 +819,6 @@
             function updateCounter(now) {
                 const elapsed = now - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                // Easing suave hacia el final
                 const easedProgress = 1 - Math.pow(1 - progress, 3);
                 const currentVal = Math.round(easedProgress * target);
                 const formattedVal = padLength ? String(currentVal).padStart(padLength, '0') : String(currentVal);
@@ -853,7 +870,6 @@
             textElements.forEach(el => el.classList.remove('fade-in-element'));
             mediaElements.forEach(el => el.classList.remove('cover-zoom-in'));
             
-            // Forzar reflow para reiniciar las animaciones CSS
             void dataCard.offsetWidth;
 
             dataCatalog.innerHTML = `<i class="fa-solid fa-barcode"></i> ${item.id}`;
