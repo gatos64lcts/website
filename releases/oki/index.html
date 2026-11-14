@@ -167,7 +167,7 @@
             object-fit: cover;
         }
 
-    <style>
+        /* --- MENÚ GLOBAL MOPHRA --- */
         .mophra-global-container {
             position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
             width: 100% !important; height: 100vh !important;
@@ -346,19 +346,60 @@
             border-radius: 50%;
         }
 
-        /* Transición suave para cambio de fondo */
+        /* Transición suave con zoom cinemático para cambio de fondo */
         .bg-layer {
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+                        filter 0.75s ease;
+            will-change: opacity, transform;
         }
 
         /* Animaciones para cambio de datos */
         .fade-in-element {
-            animation: fadeIn 0.35s ease-in-out forwards;
+            animation: slideBlurIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
+        .cover-zoom-in {
+            animation: coverReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .card-pulse-transition {
+            animation: cardBorderPulse 0.5s ease-out;
+        }
+
+        @keyframes slideBlurIn {
+            0% {
+                opacity: 0;
+                transform: translateY(7px);
+                filter: blur(4px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes coverReveal {
+            0% {
+                opacity: 0.25;
+                transform: scale(0.92);
+                filter: brightness(1.5) contrast(1.15);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                filter: brightness(1) contrast(1);
+            }
+        }
+
+        @keyframes cardBorderPulse {
+            0% {
+                box-shadow: 0 0 0 2px rgba(255, 0, 85, 0.8), 0 20px 35px rgba(255, 0, 85, 0.28);
+            }
+            100% {
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
         }
 
         /* Efecto scanline retro para el fondo */
@@ -375,13 +416,11 @@
 
         /* --- AJUSTES EXCLUSIVOS PARA MÓVIL (< 768px) --- */
         @media (max-width: 767px) {
-            /* Posicionar el área del selector arriba dejando todo el centro libre para el background */
             #main-selector-area {
                 align-items: flex-start !important;
                 padding-top: 10px !important;
             }
 
-            /* Menú horizontal mostrando 1 bloque a la vez con scroll-snap */
             #menu-list {
                 height: auto !important;
                 flex-direction: row !important;
@@ -392,10 +431,10 @@
                 gap: 10px !important;
                 padding-right: 0 !important;
                 padding-bottom: 4px !important;
-                scrollbar-width: none; /* Firefox */
+                scrollbar-width: none;
             }
             #menu-list::-webkit-scrollbar {
-                display: none; /* Chrome / Safari */
+                display: none;
             }
 
             .menu-item {
@@ -414,12 +453,10 @@
                 box-shadow: 0 0 14px rgba(255, 0, 85, 0.65) !important;
             }
 
-            /* Banner decorativo más compacto en móvil para dar aire al fondo */
             #menu-banner-container {
                 height: 52px !important;
             }
 
-            /* Franja inferior transparente con blur sutil y espacio seguro para barra de navegadores móviles */
             #mobile-footer-wrapper {
                 padding-bottom: calc(40px + env(safe-area-inset-bottom, 30px)) !important;
             }
@@ -433,7 +470,6 @@
                 background-color: rgba(255, 255, 255, 0.20) !important;
                 border-color: rgba(255, 255, 255, 0.3) !important;
             }
-            /* Textos en blanco total en vista móvil */
             #data-catalog,
             #data-catalog i,
             #data-contains-label,
@@ -452,9 +488,9 @@
 <body class="w-full relative text-white flex flex-col justify-between">
 
     <!-- Capa de Fondo 1 (Imagen principal activa) -->
-    <div id="bg-layer-1" class="bg-layer fixed inset-0 bg-cover bg-center z-0 opacity-100"></div>
+    <div id="bg-layer-1" class="bg-layer fixed inset-0 bg-cover bg-center z-0 opacity-100 scale-100"></div>
     <!-- Capa de Fondo 2 (Para transición suave entre imágenes) -->
-    <div id="bg-layer-2" class="bg-layer fixed inset-0 bg-cover bg-center z-0 opacity-0"></div>
+    <div id="bg-layer-2" class="bg-layer fixed inset-0 bg-cover bg-center z-0 opacity-0 scale-105"></div>
 
     <!-- Overlay de Gradiente Magenta/Oscuro y Scanlines -->
     <div class="fixed inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/60 z-0 pointer-events-none"></div>
@@ -522,7 +558,7 @@
                 <!-- Se poblará dinámicamente mediante JavaScript -->
             </div>
 
-            <!-- Banner o Imagen Decorativa Dinámica Limpia (Debajo del Menú, sin disco ni textos extra) -->
+            <!-- Banner o Imagen Decorativa Dinámica Limpia -->
             <div id="menu-banner-container" class="relative w-full h-24 rounded overflow-hidden bg-black/60 shadow-lg">
                 <img id="menu-banner-img" src="" alt="Banner Decorativo" class="w-full h-full object-cover">
             </div>
@@ -546,7 +582,7 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN CENTRO/MEDIO Y DERECHA: Tracks, View Now, Descripción (50% en móvil) y Cover (50% en móvil) -->
+            <!-- SECCIÓN CENTRO/MEDIO Y DERECHA: Tracks, View Now, Descripción y Cover -->
             <div class="flex-grow flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-6 border-t md:border-t-0 md:border-l border-gray-400/50 pt-3 md:pt-0 md:pl-6">
                 
                 <!-- Track Count & Botón VIEW NOW Clicable -->
@@ -653,7 +689,7 @@
         ];
 
         // Variables de estado y referencias al DOM
-        let currentIndex = 0;
+        let currentIndex = -1;
         let activeBgLayer = 1;
 
         const bgLayer1 = document.getElementById('bg-layer-1');
@@ -685,10 +721,10 @@
         // Detectar swipe horizontal en móvil y actualizar compilación activa automáticamente
         let scrollTimeout;
         menuList.addEventListener('scroll', () => {
-            if (window.innerWidth >= 768) return; // Solo aplica en móvil
+            if (window.innerWidth >= 768) return;
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
-                const itemWidth = menuList.clientWidth + 10; // Ancho del bloque + gap de 10px
+                const itemWidth = menuList.clientWidth + 10;
                 if (itemWidth > 0) {
                     const newIndex = Math.round(menuList.scrollLeft / itemWidth);
                     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < compilationsData.length) {
@@ -698,21 +734,94 @@
             }, 60);
         });
 
-        // Función para cambiar suavemente el fondo
+        // Función para cambiar suavemente el fondo con efecto de zoom cinemático
         function updateBackground(newBgUrl) {
             const currentLayer = activeBgLayer === 1 ? bgLayer1 : bgLayer2;
             const nextLayer = activeBgLayer === 1 ? bgLayer2 : bgLayer1;
 
+            nextLayer.style.transition = 'none';
             nextLayer.style.backgroundImage = `url('${newBgUrl}')`;
+            nextLayer.style.transform = 'scale(1.06)';
+            nextLayer.style.filter = 'blur(4px)';
+            nextLayer.style.opacity = '0';
+
+            void nextLayer.offsetWidth;
+
+            nextLayer.style.transition = '';
             nextLayer.style.opacity = '1';
+            nextLayer.style.transform = 'scale(1)';
+            nextLayer.style.filter = 'blur(0px)';
+
             currentLayer.style.opacity = '0';
+            currentLayer.style.transform = 'scale(0.98)';
 
             activeBgLayer = activeBgLayer === 1 ? 2 : 1;
+        }
+
+        // Efecto scramble/decodificador para textos al cambiar de compilación
+        function scrambleText(element, finalText, speed = 22) {
+            if (element._scrambleInterval) clearInterval(element._scrambleInterval);
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/#*+';
+            let iteration = 0;
+
+            element._scrambleInterval = setInterval(() => {
+                element.textContent = finalText
+                    .split('')
+                    .map((char, index) => {
+                        if (char === ' ') return ' ';
+                        if (index < iteration) return finalText[index];
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    })
+                    .join('');
+
+                if (iteration >= finalText.length) {
+                    clearInterval(element._scrambleInterval);
+                    element.textContent = finalText;
+                }
+                iteration += 1 / 2;
+            }, speed);
+        }
+
+        // Efecto de conteo secuencial desde 0 hasta la cifra final manteniendo fija la palabra 'tracks'
+        function animateTrackCount(element, tracksString, duration = 850) {
+            if (element._countFrame) cancelAnimationFrame(element._countFrame);
+
+            const match = tracksString.match(/^(\d+)\s*(.*)$/);
+            if (!match) {
+                element.textContent = tracksString;
+                return;
+            }
+
+            const rawNumber = match[1];
+            const suffix = match[2] || 'tracks';
+            const target = parseInt(rawNumber, 10);
+            const padLength = rawNumber.length > 1 && rawNumber.startsWith('0') ? rawNumber.length : 0;
+            const startTime = performance.now();
+
+            function updateCounter(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // Easing suave hacia el final
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+                const currentVal = Math.round(easedProgress * target);
+                const formattedVal = padLength ? String(currentVal).padStart(padLength, '0') : String(currentVal);
+
+                element.textContent = `${formattedVal} ${suffix}`;
+
+                if (progress < 1) {
+                    element._countFrame = requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = `${rawNumber} ${suffix}`;
+                }
+            }
+
+            element._countFrame = requestAnimationFrame(updateCounter);
         }
 
         // Función principal para cambiar la compilación activa
         function selectCompilation(index, syncScroll = true) {
             if (index < 0 || index >= compilationsData.length) return;
+            if (index === currentIndex) return;
             currentIndex = index;
 
             const item = compilationsData[index];
@@ -735,22 +844,29 @@
             // 2. Actualizar Fondo
             updateBackground(item.bgImage);
 
-            // 3. Actualizar Datos en Franja Blanca con animación fade
-            const animatedElements = [dataCatalog, dataTitle, dataTracks, dataDescription, dataCoverImg, menuBannerImg];
+            // 3. Actualizar Datos en Franja Blanca con transiciones
+            const dataCard = document.getElementById('data-glass-card');
+            const textElements = [dataCatalog, dataDescription];
+            const mediaElements = [dataCoverImg, menuBannerImg];
             
-            animatedElements.forEach(el => el.classList.remove('fade-in-element'));
+            dataCard.classList.remove('card-pulse-transition');
+            textElements.forEach(el => el.classList.remove('fade-in-element'));
+            mediaElements.forEach(el => el.classList.remove('cover-zoom-in'));
             
-            // Forzar reflow para reiniciar la animación CSS
-            void dataTitle.offsetWidth;
+            // Forzar reflow para reiniciar las animaciones CSS
+            void dataCard.offsetWidth;
+
             dataCatalog.innerHTML = `<i class="fa-solid fa-barcode"></i> ${item.id}`;
-            dataTitle.textContent = item.title;
-            dataTracks.textContent = item.tracks;
+            scrambleText(dataTitle, item.title, 22);
+            animateTrackCount(dataTracks, item.tracks, 850);
             dataDescription.textContent = item.description;
             dataCoverImg.src = item.coverImage;
             menuBannerImg.src = item.bannerImage;
             if (viewNowBtn) viewNowBtn.setAttribute('href', item.url);
 
-            animatedElements.forEach(el => el.classList.add('fade-in-element'));
+            dataCard.classList.add('card-pulse-transition');
+            textElements.forEach(el => el.classList.add('fade-in-element'));
+            mediaElements.forEach(el => el.classList.add('cover-zoom-in'));
         }
 
         // Inicialización al cargar la página
