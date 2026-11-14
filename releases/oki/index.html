@@ -410,17 +410,17 @@
         #menu-banner-container {
             position: relative;
             width: 100%;
-            height: 110px; /* Altura ajustada para que respire la animación */
+            height: 110px;
             border-radius: 6px;
             overflow: hidden;
-            background-color: transparent !important; /* Sin fondo negro forzado */
+            background-color: transparent !important;
             box-shadow: none;
         }
 
         #menu-banner-img {
             width: 100%;
             height: 100%;
-            object-fit: contain !important; /* Soluciona el recorte arriba/abajo y el marco negro */
+            object-fit: contain !important;
             object-position: center;
             background: transparent !important;
         }
@@ -580,9 +580,8 @@
                     <i class="fa-solid fa-barcode text-black"></i> MOPHRA017
                 </span>
                 <div class="bg-black text-white px-4 py-2 rounded mt-1 shadow-md flex items-center justify-between">
-                    <!-- QUITADA LA CLASE 'uppercase' PARA RESPETAR MINÚSCULAS/MAYÚSCULAS -->
                     <h2 id="data-title" class="font-black text-xl md:text-2xl tracking-wide truncate">
-                        UNDERCOVERRNB
+                        MOPHRA presents USB HOT
                     </h2>
                 </div>
             </div>
@@ -605,7 +604,7 @@
                     <div id="data-description-box" class="w-full md:max-w-md bg-white/80 p-3 rounded-lg border border-gray-200/80 flex flex-col justify-center">
                         <span id="data-desc-label" class="text-[10px] font-mono text-gray-500 block font-bold uppercase mb-0.5">ALBUM DESCRIPTION</span>
                         <p id="data-description" class="text-xs md:text-sm text-gray-800 leading-relaxed font-medium line-clamp-3">
-                            Edición especial que fusiona tonos R&B futuristas con ritmos nocturnos y sintetizadores profundos.
+                            Album electronic experimental.
                         </p>
                     </div>
 
@@ -627,11 +626,15 @@
         const compilationsData = [
             {
                 id: "MOPHRA017",
-                title: "MOPHRA presents USB HOT", /* Aquí puedes escribirlo exacto como lo requieras */
+                title: "MOPHRA presents USB HOT",
                 tracks: "17 tracks",
                 url: "/releases/compilations/undercoverrnb/",
                 description: "Album electronic experimental.",
-                bgImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1600&auto=format&fit=crop",
+                bgImages: [
+                    "./usbhot/bg1.webp",
+                    "./usbhot/bg2.webp",
+                    "./usbhot/bg3.webp"
+                ],
                 bannerImage: "./usbhot/allartists.webp",
                 coverImage: "./usbhot/017-usbhot.webp"
             },
@@ -641,7 +644,11 @@
                 tracks: "12 tracks",
                 url: "/releases/compilations/usb-hot/",
                 description: "Colección de bombas de club de archivo extraídas directamente de memorias USB perdidas en rave parties.",
-                bgImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1600&auto=format&fit=crop",
+                bgImages: [
+                    "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1600&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1600&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=1600&auto=format&fit=crop"
+                ],
                 bannerImage: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=600&auto=format&fit=crop",
                 coverImage: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop"
             },
@@ -651,7 +658,11 @@
                 tracks: "20 tracks",
                 url: "/releases/compilations/acid-rage-90/",
                 description: "Sonidos analógicos distorsionados de sintetizadores TB-303 preparados para pistas de baile subterráneas.",
-                bgImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1600&auto=format&fit=crop",
+                bgImages: [
+                    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1600&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1600&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop"
+                ],
                 bannerImage: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop",
                 coverImage: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=400&auto=format&fit=crop"
             },
@@ -661,7 +672,11 @@
                 tracks: "15 tracks",
                 url: "/releases/compilations/neo-tokyo-drift/",
                 description: "Compilación Synthwave y Cyberpunk con sonidos inspirados en la estética japonesa de los 90.",
-                bgImage: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=1600&auto=format&fit=crop",
+                bgImages: [
+                    "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=1600&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1600&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1600&auto=format&fit=crop"
+                ],
                 bannerImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop",
                 coverImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&auto=format&fit=crop"
             },
@@ -671,7 +686,11 @@
                 tracks: "14 tracks",
                 url: "/releases/compilations/hyperpop-heaven/",
                 description: "Vocales procesadas al límite con ritmos acelerados, bajos potentes y texturas brillantes.",
-                bgImage: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1600&auto=format&fit=crop",
+                bgImages: [
+                    "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1600&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=1600&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop"
+                ],
                 bannerImage: "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop",
                 coverImage: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=400&auto=format&fit=crop"
             },
@@ -681,7 +700,11 @@
                 tracks: "09 tracks",
                 url: "/releases/compilations/dark-ambient-iii/",
                 description: "Paisajes sonoros desolados, atmósferas envolventes y frecuencias graves para introspección profunda.",
-                bgImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop",
+                bgImages: [
+                    "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1600&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1600&auto=format&fit=crop"
+                ],
                 bannerImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop",
                 coverImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=400&auto=format&fit=crop"
             }
@@ -729,6 +752,25 @@
                 }
             }, 60);
         });
+
+        // Selector aleatorio de background sin repetir el último visto en la sesión
+        function getRandomBg(item) {
+            const list = item.bgImages || (item.bgImage ? [item.bgImage] : []);
+            if (list.length === 0) return '';
+            if (list.length === 1) return list[0];
+
+            const storageKey = `mophra_last_bg_${item.id}`;
+            const lastBg = sessionStorage.getItem(storageKey);
+            let chosen = list[Math.floor(Math.random() * list.length)];
+
+            if (chosen === lastBg) {
+                const alternatives = list.filter(bg => bg !== lastBg);
+                chosen = alternatives[Math.floor(Math.random() * alternatives.length)];
+            }
+
+            sessionStorage.setItem(storageKey, chosen);
+            return chosen;
+        }
 
         function updateBackground(newBgUrl) {
             const currentLayer = activeBgLayer === 1 ? bgLayer1 : bgLayer2;
@@ -830,7 +872,9 @@
                 menuButtons[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
 
-            updateBackground(item.bgImage);
+            // Selecciona un fondo aleatorio de la lista de la compilación
+            const selectedBg = getRandomBg(item);
+            updateBackground(selectedBg);
 
             const dataCard = document.getElementById('data-glass-card');
             const textElements = [dataCatalog, dataDescription];
@@ -856,7 +900,6 @@
         }
 
         window.onload = function() {
-            bgLayer1.style.backgroundImage = `url('${compilationsData[0].bgImage}')`;
             renderMenu();
             selectCompilation(0);
         };
