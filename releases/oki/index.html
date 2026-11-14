@@ -565,10 +565,13 @@
     <main id="main-selector-area" class="relative z-10 flex-grow flex justify-start px-4 md:px-12 pb-2">
         
         <!-- Menú Contenedor (Lado Izquierdo en PC / Menos largo) -->
-        <aside class="w-full max-w-full md:max-w-xs flex flex-col gap-2.5 md:gap-3.5">
+        <aside class="w-full max-w-full md:max-w-xs flex flex-col gap-2 md:gap-3">
             
-            <div class="flex items-center justify-center text-xs font-mono text-gray-300 bg-black/75 px-3 py-1.5 rounded border-l-2 border-neonPink backdrop-blur-sm">
-                <span class="uppercase tracking-wider text-center">SELECT COMPILATION</span>
+            <div class="flex items-center justify-between md:justify-center text-[11px] font-mono text-gray-300 bg-black/75 px-3 py-1.5 rounded border-l-2 border-neonPink backdrop-blur-sm">
+                <span class="uppercase tracking-wider">SELECT COMPILATION</span>
+                <span class="md:hidden text-[10px] text-gray-400 lowercase tracking-normal flex items-center gap-1">
+                    <i class="fa-solid fa-arrows-left-right text-[9px] text-neonPink"></i> desliza
+                </span>
             </div>
 
             <!-- Menú de ítems: 4 visibles en PC / 1 horizontal en Móvil -->
@@ -615,10 +618,10 @@
                     </a>
                 </div>
 
-                <!-- Contenedor 50% Descripción / 50% Cover en Móvil; fila limpia en Escritorio -->
-                <div class="grid grid-cols-2 md:flex md:flex-row items-stretch md:items-center gap-3 md:gap-6 flex-grow justify-end">
+                <!-- Contenedor Descripción (Ocupa todo en móvil) / Cover (Oculto en móvil, visible en PC) -->
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-6 flex-grow justify-end">
                     
-                    <!-- Mitad Izquierda (50% en móvil): Bloque con Descripción del Álbum -->
+                    <!-- Bloque con Descripción del Álbum (Ancho completo en móvil) -->
                     <div id="data-description-box" class="w-full md:max-w-md bg-white/80 p-3 rounded-lg border border-gray-200/80 flex flex-col justify-center">
                         <span id="data-desc-label" class="text-[10px] font-mono text-gray-500 block font-bold uppercase mb-0.5">ALBUM DESCRIPTION</span>
                         <p id="data-description" class="text-xs md:text-sm text-gray-800 leading-relaxed font-medium line-clamp-3">
@@ -626,9 +629,9 @@
                         </p>
                     </div>
 
-                    <!-- Mitad Derecha (50% en móvil): Imagen del Cover del Álbum -->
-                    <div class="w-full md:w-auto flex items-center justify-center md:justify-end md:border-l border-gray-400/50 md:pl-6">
-                        <div class="w-full aspect-square max-w-[125px] md:max-w-none md:w-20 md:h-20 rounded-md overflow-hidden bg-gray-900 flex-shrink-0">
+                    <!-- Mitad Derecha: Imagen del Cover del Álbum (Oculto en móvil con hidden, visible en pc con md:flex) -->
+                    <div class="hidden md:flex w-auto items-center justify-end border-l border-gray-400/50 pl-6">
+                        <div class="w-20 h-20 rounded-md overflow-hidden bg-gray-900 flex-shrink-0">
                             <img id="data-cover-img" src="" alt="Album Cover" class="w-full h-full object-cover block">
                         </div>
                     </div>
@@ -876,7 +879,7 @@
             scrambleText(dataTitle, item.title, 22);
             animateTrackCount(dataTracks, item.tracks, 850);
             dataDescription.textContent = item.description;
-            dataCoverImg.src = item.coverImage;
+            if (dataCoverImg) dataCoverImg.src = item.coverImage;
             menuBannerImg.src = item.bannerImage;
             if (viewNowBtn) viewNowBtn.setAttribute('href', item.url);
 
@@ -962,7 +965,7 @@
             else initMenu();
         })();
 
-        // --- LÓGICA DE LA CORTINA METÁLica DE TRANSICIÓN ---
+        // --- LÓGICA DE LA CORTINA METÁLICA DE TRANSICIÓN ---
         (function() {
             const cortina = document.getElementById('cortina-transicion');
 
