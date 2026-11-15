@@ -356,7 +356,7 @@
             border-radius: 50%;
         }
 
-        /* --- CAPAS DE VIDEO DE FONDO (OCULTAR CONTROLES NATIVOS EN MÓVIL) --- */
+        /* --- CAPAS DE VIDEO DE FONDO --- */
         .bg-layer {
             transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
                         transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
@@ -431,6 +431,29 @@
             background: transparent !important;
         }
 
+        /* --- ESTILOS DE CRISTAL UNIFICADOS (PC Y MÓVIL) --- */
+        #data-glass-card {
+            background-color: rgba(15, 15, 20, 0.6) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        }
+        #data-description-box {
+            background-color: rgba(255, 255, 255, 0.06) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        #data-catalog,
+        #data-contains-label,
+        #data-tracks,
+        #data-desc-label,
+        #data-description {
+            color: #ffffff !important;
+        }
+        #data-contains-label,
+        #data-desc-label {
+            opacity: 0.75;
+        }
+
         @media (max-width: 767px) {
             #main-selector-area {
                 align-items: flex-start !important;
@@ -475,28 +498,6 @@
 
             #mobile-footer-wrapper {
                 padding-bottom: calc(40px + env(safe-area-inset-bottom, 30px)) !important;
-            }
-            #data-glass-card {
-                background-color: rgba(255, 255, 255, 0.24) !important;
-                backdrop-filter: blur(3px) !important;
-                -webkit-backdrop-filter: blur(3px) !important;
-                border: 1px solid rgba(255, 255, 255, 0.35) !important;
-            }
-            #data-description-box {
-                background-color: rgba(255, 255, 255, 0.20) !important;
-                border-color: rgba(255, 255, 255, 0.3) !important;
-            }
-            #data-catalog,
-            #data-catalog i,
-            #data-contains-label,
-            #data-tracks,
-            #data-desc-label,
-            #data-description {
-                color: #ffffff !important;
-            }
-            #data-contains-label,
-            #data-desc-label {
-                opacity: 0.85;
             }
         }
     </style>
@@ -579,27 +580,27 @@
 
     <!-- FRANJA INFERIOR DE DATOS DINÁMICOS -->
     <footer id="mobile-footer-wrapper" class="relative z-20 px-4 md:px-12 pb-6">
-        <div id="data-glass-card" class="bg-[#f4f4f4] text-black rounded-xl shadow-2xl p-4 md:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-4 backdrop-blur-md">
+        <div id="data-glass-card" class="rounded-xl shadow-2xl p-4 md:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-4 backdrop-blur-md">
             
             <div class="flex flex-col justify-center min-w-[220px]">
-                <span id="data-catalog" class="font-mono font-bold text-sm text-gray-800 tracking-wider flex items-center gap-1.5">
-                    <i class="fa-solid fa-barcode text-black"></i> MOPHRA017
+                <span id="data-catalog" class="font-mono font-bold text-sm tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-barcode"></i> MOPHRA017
                 </span>
-                <div class="bg-black text-white px-4 py-2 rounded mt-1 shadow-md flex items-center justify-between">
+                <div class="bg-black/60 border border-white/10 text-white px-4 py-2 rounded mt-1 shadow-md flex items-center justify-between backdrop-blur-sm">
                     <h2 id="data-title" class="font-black text-xl md:text-2xl tracking-wide truncate">
                         MOPHRA presents USB HOT
                     </h2>
                 </div>
             </div>
 
-            <div class="flex-grow flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-6 border-t md:border-t-0 md:border-l border-gray-400/50 pt-3 md:pt-0 md:pl-6">
+            <div class="flex-grow flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-6 border-t md:border-t-0 md:border-l border-white/15 pt-3 md:pt-0 md:pl-6">
                 
                 <div class="flex md:flex-col items-center md:items-start justify-between w-full md:w-auto gap-2 flex-shrink-0">
                     <div>
-                        <span id="data-contains-label" class="block text-xs font-bold uppercase text-gray-600 font-mono">contains</span>
-                        <span id="data-tracks" class="font-black text-lg md:text-xl leading-none text-black">17 tracks</span>
+                        <span id="data-contains-label" class="block text-xs font-bold uppercase font-mono">contains</span>
+                        <span id="data-tracks" class="font-black text-lg md:text-xl leading-none">17 tracks</span>
                     </div>
-                    <a id="view-now-btn" href="/releases/compilations/undercoverrnb/" class="bg-black hover:bg-neonPink text-white font-mono text-xs font-bold px-4 py-2 rounded tracking-widest transition-colors duration-200 flex items-center gap-2 shadow cursor-pointer">
+                    <a id="view-now-btn" href="/releases/compilations/undercoverrnb/" class="bg-black/80 hover:bg-neonPink text-white font-mono text-xs font-bold px-4 py-2 rounded tracking-widest transition-colors duration-200 flex items-center gap-2 shadow cursor-pointer border border-white/20">
                         <span>VIEW NOW</span>
                         <i class="fa-solid fa-arrow-right text-[10px]"></i>
                     </a>
@@ -607,15 +608,15 @@
 
                 <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-6 flex-grow justify-end">
                     
-                    <div id="data-description-box" class="w-full md:max-w-md bg-white/80 p-3 rounded-lg border border-gray-200/80 flex flex-col justify-center">
-                        <span id="data-desc-label" class="text-[10px] font-mono text-gray-500 block font-bold uppercase mb-0.5">ALBUM DESCRIPTION</span>
-                        <p id="data-description" class="text-xs md:text-sm text-gray-800 leading-relaxed font-medium line-clamp-3">
+                    <div id="data-description-box" class="w-full md:max-w-md p-3 rounded-lg flex flex-col justify-center backdrop-blur-sm">
+                        <span id="data-desc-label" class="text-[10px] font-mono block font-bold uppercase mb-0.5">ALBUM DESCRIPTION</span>
+                        <p id="data-description" class="text-xs md:text-sm leading-relaxed font-medium line-clamp-3">
                             Experimental Electronic Album.
                         </p>
                     </div>
 
-                    <div class="hidden md:flex w-auto items-center justify-end border-l border-gray-400/50 pl-6">
-                        <div class="w-20 h-20 rounded-md overflow-hidden bg-gray-900 flex-shrink-0">
+                    <div class="hidden md:flex w-auto items-center justify-end border-l border-white/15 pl-6">
+                        <div class="w-20 h-20 rounded-md overflow-hidden bg-gray-900 flex-shrink-0 border border-white/20">
                             <img id="data-cover-img" src="" alt="Album Cover" class="w-full h-full object-cover block">
                         </div>
                     </div>
@@ -640,6 +641,39 @@
                 bgVideoMobile: "./usbhot/bg-movil.webm",
                 bannerImage: "./usbhot/allartists.webp",
                 coverImage: "./usbhot/017-usbhot.webp"
+            },
+            {
+                id: "MOPHRA018",
+                title: "USB HOT",
+                tracks: "12 tracks",
+                url: "/releases/compilations/usb-hot/",
+                description: "Colección de bombas de club de archivo extraídas directamente de memorias USB perdidas en rave parties.",
+                bgVideoDesktop: "./usbhot/bg4.webm",
+                bgVideoMobile: "./usbhot/bg4-mobile.webm",
+                bannerImage: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=600&auto=format&fit=crop",
+                coverImage: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop"
+            },
+            {
+                id: "MOPHRA020",
+                title: "NEO TOKYO DRIFT",
+                tracks: "15 tracks",
+                url: "/releases/compilations/neo-tokyo-drift/",
+                description: "Compilación Synthwave y Cyberpunk con sonidos inspirados en la estética japonesa de los 90.",
+                bgVideoDesktop: "./usbhot/bg1.webm",
+                bgVideoMobile: "./usbhot/bg1-mobile.webm",
+                bannerImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop",
+                coverImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&auto=format&fit=crop"
+            },
+            {
+                id: "MOPHRA022",
+                title: "DARK AMBIENT III",
+                tracks: "09 tracks",
+                url: "/releases/compilations/dark-ambient-iii/",
+                description: "Paisajes sonoros desolados, atmósferas envolventes y frecuencias graves para introspección profunda.",
+                bgVideoDesktop: "./usbhot/bg1.webm",
+                bgVideoMobile: "./usbhot/bg1-mobile.webm",
+                bannerImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop",
+                coverImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=400&auto=format&fit=crop"
             }
         ];
 
