@@ -356,12 +356,17 @@
             border-radius: 50%;
         }
 
-        /* --- CAPAS DE VIDEO DE FONDO --- */
+        /* --- CAPAS DE VIDEO DE FONDO (OCULTAR CONTROLES NATIVOS EN MÓVIL) --- */
         .bg-layer {
             transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
                         transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
                         filter 0.75s ease;
             will-change: opacity, transform;
+        }
+        video::-webkit-media-controls,
+        video::-webkit-media-controls-start-playback-button {
+            display: none !important;
+            -webkit-appearance: none;
         }
 
         .fade-in-element {
@@ -499,9 +504,9 @@
 <body class="w-full relative text-white flex flex-col justify-between">
 
     <!-- Capa de Video de Fondo 1 -->
-    <video id="bg-layer-1" class="bg-layer fixed inset-0 w-full h-full object-cover z-0 opacity-100 scale-100 pointer-events-none" autoplay muted loop playsinline></video>
+    <video id="bg-layer-1" class="bg-layer fixed inset-0 w-full h-full object-cover z-0 opacity-100 scale-100 pointer-events-none" autoplay muted loop playsinline webkit-playsinline preload="auto"></video>
     <!-- Capa de Video de Fondo 2 (Para transición suave entre videos) -->
-    <video id="bg-layer-2" class="bg-layer fixed inset-0 w-full h-full object-cover z-0 opacity-0 scale-105 pointer-events-none" autoplay muted loop playsinline></video>
+    <video id="bg-layer-2" class="bg-layer fixed inset-0 w-full h-full object-cover z-0 opacity-0 scale-105 pointer-events-none" autoplay muted loop playsinline webkit-playsinline preload="auto"></video>
 
     <div class="fixed inset-0 bg-gradient-to-t from-black/60 via-black/15 to-black/30 z-0 pointer-events-none"></div>
     <div class="fixed inset-0 scanline z-0 pointer-events-none opacity-25"></div>
@@ -687,6 +692,30 @@
         const dataCoverImg = document.getElementById('data-cover-img');
         const viewNowBtn = document.getElementById('view-now-btn');
 
+        // Helper para asegurar reproducción silenciada en iOS / Safari / Brave
+        function safePlayVideo(videoEl) {
+            if (!videoEl || !videoEl.src) return;
+            videoEl.muted = true;
+            videoEl.defaultMuted = true;
+            videoEl.setAttribute('muted', '');
+            videoEl.setAttribute('playsinline', '');
+            videoEl.setAttribute('webkit-playsinline', '');
+            const playPromise = videoEl.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {});
+            }
+        }
+
+        // Si el navegador bloquea el autoplay por ahorro de batería/privacidad, arranca al primer toque o scroll
+        ['touchstart', 'click', 'scroll'].forEach(evt => {
+            window.addEventListener(evt, () => {
+                const currentLayer = activeBgLayer === 1 ? bgLayer2 : bgLayer1;
+                if (currentLayer && currentLayer.paused && currentLayer.src) {
+                    safePlayVideo(currentLayer);
+                }
+            }, { passive: true });
+        });
+
         function renderMenu() {
             menuList.innerHTML = '';
             compilationsData.forEach((item, index) => {
@@ -735,7 +764,8 @@
             nextLayer.style.transition = 'none';
             nextLayer.src = newVideoUrl;
             nextLayer.load();
-            nextLayer.play().catch(() => {});
+            safePlayVideo(nextLayer);
+            nextLayer.addEventListener('loadeddata', () => safePlayVideo(nextLayer), { once: true });
 
             nextLayer.style.transform = 'scale(1.06)';
             nextLayer.style.filter = 'blur(4px)';
