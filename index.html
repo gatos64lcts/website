@@ -224,8 +224,9 @@
       padding: 4px 0 !important;
       display: block !important;
       opacity: 0 !important;
-      transform: translate3d(0, -8px, 0) !important;
-      transition: color 0.15s ease, transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease !important;
+      transform: translate3d(0, -6px, 0) !important;
+      /* SALIDA RÁPIDA: 0.15s para que al quitar el puntero vuelva de inmediato */
+      transition: color 0.15s ease, transform 0.12s cubic-bezier(0.15, 1, 0.3, 1), opacity 0.3s ease !important;
     }
 
     .mophra-dropdown-wrapper.submenu-open .mophra-sub-item {
@@ -244,13 +245,14 @@
     .mophra-dropdown-wrapper.submenu-open .mophra-sub-item:nth-child(8)  { transition-delay: 0.32s !important; }
     .mophra-dropdown-wrapper.submenu-open .mophra-sub-item:nth-child(9)  { transition-delay: 0.36s !important; }
     .mophra-dropdown-wrapper.submenu-open .mophra-sub-item:nth-child(10) { transition-delay: 0.40s !important; }
-    .mophra-dropdown-wrapper.submenu-open .mophra-sub-item:nth-child(n+11){ transition-delay: 0.44s !important; }
-
-    /* 🔥 EFECTO HOVER INMEDIATO CON MAYOR ESPECIFICIDAD */
+    .mophra-dropdown-wrapper.submenu-open .mophra-sub-item:nth-child(n+11) { transition-delay: 0.44s !important; }
+    
+    /* 🔥 HOVER INMEDIATO Y SIN RETRASOS */
     .mophra-dropdown-wrapper.submenu-open .mophra-sub-item:hover,
     .mophra-sub-item:hover {
       color: #ffffff !important;
-      transform: translate3d(8px, 0, 0) !important;
+      transform: translate3d(1px, 0, 0) !important;
+      transition: color 0.15s ease, transform 0.10s cubic-bezier(0.15, 1, 0.3, 1) !important;
       transition-delay: 0s !important;
     }
 
