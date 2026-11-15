@@ -605,7 +605,7 @@
                     <div id="data-description-box" class="w-full md:max-w-md bg-white/80 p-3 rounded-lg border border-gray-200/80 flex flex-col justify-center">
                         <span id="data-desc-label" class="text-[10px] font-mono text-gray-500 block font-bold uppercase mb-0.5">ALBUM DESCRIPTION</span>
                         <p id="data-description" class="text-xs md:text-sm text-gray-800 leading-relaxed font-medium line-clamp-3">
-                            Album electronic experimental.
+                            Experimental Electronic Album.
                         </p>
                     </div>
 
@@ -631,11 +631,8 @@
                 tracks: "17 tracks",
                 url: "/releases/compilations/undercoverrnb/",
                 description: "Experimental Electronic Album.",
-                bgVideos: [
-                    "./usbhot/bg-1.mp4",
-                    "./usbhot/bg-2.mp4",
-                    "./usbhot/bg-3.mp4"
-                ],
+                bgVideoDesktop: "./usbhot/backg-pc.mp4",
+                bgVideoMobile: "./usbhot/backg-phone.mp4",
                 bannerImage: "./usbhot/allartists.webp",
                 coverImage: "./usbhot/017-usbhot.webp"
             },
@@ -645,11 +642,8 @@
                 tracks: "12 tracks",
                 url: "/releases/compilations/usb-hot/",
                 description: "Colección de bombas de club de archivo extraídas directamente de memorias USB perdidas en rave parties.",
-                bgVideos: [
-                    "./usbhot/bg4.webm",
-                    "./usbhot/bg5.webm",
-                    "./usbhot/bg6.webm"
-                ],
+                bgVideoDesktop: "./usbhot/bg4.webm",
+                bgVideoMobile: "./usbhot/bg4-mobile.webm",
                 bannerImage: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=600&auto=format&fit=crop",
                 coverImage: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop"
             },
@@ -659,11 +653,8 @@
                 tracks: "15 tracks",
                 url: "/releases/compilations/neo-tokyo-drift/",
                 description: "Compilación Synthwave y Cyberpunk con sonidos inspirados en la estética japonesa de los 90.",
-                bgVideos: [
-                    "./usbhot/bg1.webm",
-                    "./usbhot/bg2.webm",
-                    "./usbhot/bg3.webm"
-                ],
+                bgVideoDesktop: "./usbhot/bg1.webm",
+                bgVideoMobile: "./usbhot/bg1-mobile.webm",
                 bannerImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop",
                 coverImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&auto=format&fit=crop"
             },
@@ -673,11 +664,8 @@
                 tracks: "09 tracks",
                 url: "/releases/compilations/dark-ambient-iii/",
                 description: "Paisajes sonoros desolados, atmósferas envolventes y frecuencias graves para introspección profunda.",
-                bgVideos: [
-                    "./usbhot/bg1.webm",
-                    "./usbhot/bg2.webm",
-                    "./usbhot/bg3.webm"
-                ],
+                bgVideoDesktop: "./usbhot/bg1.webm",
+                bgVideoMobile: "./usbhot/bg1-mobile.webm",
                 bannerImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop",
                 coverImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=400&auto=format&fit=crop"
             }
@@ -685,6 +673,7 @@
 
         let currentIndex = -1;
         let activeBgLayer = 1;
+        let currentLoadedVideoUrl = "";
 
         const bgLayer1 = document.getElementById('bg-layer-1');
         const bgLayer2 = document.getElementById('bg-layer-2');
@@ -726,27 +715,20 @@
             }, 60);
         });
 
-        // Selector aleatorio de video WebM sin repetir el último visto en la sesión
-        function getRandomVideo(item) {
-            const list = item.bgVideos || [];
-            if (list.length === 0) return '';
-            if (list.length === 1) return list[0];
-
-            const storageKey = `mophra_last_video_${item.id}`;
-            const lastVideo = sessionStorage.getItem(storageKey);
-            let chosen = list[Math.floor(Math.random() * list.length)];
-
-            if (chosen === lastVideo) {
-                const alternatives = list.filter(v => v !== lastVideo);
-                chosen = alternatives[Math.floor(Math.random() * alternatives.length)];
+        // Devuelve el video correspondiente según si es PC (>= 768px) o Móvil (< 768px)
+        function getDeviceVideo(item) {
+            const isMobile = window.innerWidth < 768;
+            if (isMobile) {
+                return item.bgVideoMobile || item.bgVideoDesktop || '';
             }
-
-            sessionStorage.setItem(storageKey, chosen);
-            return chosen;
+            return item.bgVideoDesktop || item.bgVideoMobile || '';
         }
 
-        // Transición suave entre videos WebM con fundido y zoom
+        // Transición suave entre videos con fundido y zoom
         function updateBackground(newVideoUrl) {
+            if (!newVideoUrl || newVideoUrl === currentLoadedVideoUrl) return;
+            currentLoadedVideoUrl = newVideoUrl;
+
             const currentLayer = activeBgLayer === 1 ? bgLayer1 : bgLayer2;
             const nextLayer = activeBgLayer === 1 ? bgLayer2 : bgLayer1;
 
@@ -849,8 +831,8 @@
                 menuButtons[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
 
-            // Selecciona un video WebM aleatorio y actualiza el fondo
-            const selectedVideo = getRandomVideo(item);
+            // Selecciona el video de PC o Móvil según la pantalla
+            const selectedVideo = getDeviceVideo(item);
             updateBackground(selectedVideo);
 
             const dataCard = document.getElementById('data-glass-card');
@@ -875,6 +857,18 @@
             textElements.forEach(el => el.classList.add('fade-in-element'));
             mediaElements.forEach(el => el.classList.add('cover-zoom-in'));
         }
+
+        // Si el usuario cambia el tamaño de ventana entre PC y Móvil, actualiza el video correspondiente
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (currentIndex >= 0 && compilationsData[currentIndex]) {
+                    const targetVideo = getDeviceVideo(compilationsData[currentIndex]);
+                    updateBackground(targetVideo);
+                }
+            }, 150);
+        });
 
         window.onload = function() {
             renderMenu();
