@@ -94,7 +94,7 @@
             }
         }
 
-        /* --- 📜 CONTENEDOR PRINCIPAL DE CONTENIDO (Margen izquierdo aumentado para liberar el botón) --- */
+        /* --- 📜 CONTENEDOR PRINCIPAL DE CONTENIDO --- */
         .mophra-content-flow {
             position: relative;
             z-index: 3;
@@ -160,7 +160,7 @@
             justify-content: flex-start;
             align-items: flex-start;
             width: 100%;
-            max-width: 650px;
+            max-width: 680px;
         }
 
         .mophra-details-grid {
@@ -179,12 +179,14 @@
             align-items: flex-start;
         }
 
-       .mophra-tracklist-header-wrapper {
+        .mophra-tracklist-header-wrapper {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 14px;
             width: 100%;
-            max-width: 550px;
+            max-width: 640px;
             margin-bottom: 15px;
         }
 
@@ -199,6 +201,58 @@
             text-align: left;
         }
 
+        /* --- ⏯️ BOTÓN PLAY ALL Y CONTADOR GLOBAL --- */
+        .mophra-play-all-btn {
+            font-family: 'RelicusMono', monospace !important;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            color: #ffffff;
+            height: 34px;
+            padding: 0 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .mophra-play-all-btn:hover {
+            background: #ffffff;
+            color: #0d0d0d;
+            border-color: #ffffff;
+            transform: scale(1.06);
+        }
+
+        .mophra-play-all-btn.is-playing-all {
+            background: #F5260A;
+            border-color: #F5260A;
+            color: #ffffff;
+            box-shadow: 0 0 16px rgba(245, 38, 10, 0.55);
+        }
+
+        .mophra-global-timer {
+            font-family: 'RelicusMono', monospace !important;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.65);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.3px;
+            transition: color 0.25s ease, text-shadow 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .mophra-global-timer.is-active-global {
+            color: #F5260A;
+            text-shadow: 0 0 12px rgba(245, 38, 10, 0.55);
+        }
+
         /* --- 🎛️ ESTILOS PARA TRACK ITEMS --- */
         .mophra-track-item {
             font-family: 'RelicusMono', monospace !important;
@@ -208,23 +262,45 @@
             text-transform: none !important;
             padding: 8px 0;
             width: 100%;
-            max-width: 550px;
+            max-width: 640px;
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            gap: 15px !important;
+            gap: 12px !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            transition: color 0.2s ease;
+            transition: color 0.25s ease, border-color 0.25s ease, text-shadow 0.25s ease;
         }
 
         .mophra-track-item:hover {
             color: #ffffff;
         }
 
+        /* --- 🔴 RESALTADO DE PISTA ACTIVA EN MODO PLAY ALL --- */
+        .mophra-track-item.is-active-track {
+            color: #F5260A !important;
+            border-bottom-color: rgba(245, 38, 10, 0.65);
+            text-shadow: 0 0 14px rgba(245, 38, 10, 0.5);
+        }
+
+        .mophra-track-item.is-active-track .mophra-play-btn {
+            background: #F5260A;
+            border-color: #F5260A;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(245, 38, 10, 0.6);
+        }
+
+        .mophra-track-item.is-active-track .mophra-track-timer {
+            color: #F5260A;
+        }
+
+        .mophra-track-item.is-active-track .mophra-progress-bar {
+            background: #F5260A;
+        }
+
         .mophra-track-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex-shrink: 0;
         }
 
@@ -250,6 +326,23 @@
             color: #0d0d0d;
             border-color: #ffffff;
             transform: scale(1.1);
+        }
+
+        /* --- ⏱️ CONTADOR DE TIEMPO POR PISTA --- */
+        .mophra-track-timer {
+            font-family: 'RelicusMono', monospace !important;
+            font-size: clamp(11px, 1.05vw, 13px);
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.55);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.4px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: color 0.25s ease;
+        }
+
+        .mophra-track-item.is-playing-single .mophra-track-timer {
+            color: #ffffff;
         }
 
         .mophra-track-name {
@@ -292,7 +385,7 @@
         }
         
         .mophra-progress-container {
-            width: 110px;
+            width: 105px;
             height: 6px;
             background: rgba(255, 255, 255, 0.15);
             border-radius: 3px;
@@ -306,14 +399,14 @@
             height: 100%;
             width: 0%;
             background: #ffffff;
-            transition: width 0.1s linear;
+            transition: width 0.1s linear, background-color 0.25s ease;
         }
 
         /* --- 🔘 BOTONES DE MEDIA --- */
         .mophra-media-col {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
             width: 100%;
             margin-top: 15px;
@@ -341,27 +434,26 @@
             transform: scale(1.03);
         }
 
+        /* Botones SoundCloud y YouTube sin marco */
         .mophra-social-btn {
             font-family: 'RelicusMono', monospace !important;
             background-color: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: none !important;
             color: rgba(255, 255, 255, 0.85);
-            padding: 9px 16px;
+            padding: 9px 10px;
             font-size: 13px;
             font-weight: 700;
             text-decoration: none;
-            border-radius: 3px;
             text-transform: uppercase;
             letter-spacing: -0.5px;
-            transition: all 0.25s ease;
+            transition: color 0.25s ease, transform 0.25s ease;
             display: inline-block;
         }
 
         .mophra-social-btn:hover {
-            background-color: rgba(255, 255, 255, 0.15);
+            background-color: transparent;
             color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.6);
-            transform: scale(1.02);
+            transform: scale(1.04);
         }
 
         @media (max-width: 900px) {
@@ -375,14 +467,27 @@
             .mophra-bottom-title {
                 font-size: clamp(60px, 12vw, 200px) !important;
             }
+            .mophra-track-item {
+                gap: 8px !important;
+            }
+            .mophra-track-left {
+                gap: 7px;
+            }
+            .mophra-track-timer {
+                font-size: 10px;
+            }
             .mophra-progress-container {
-                width: 70px;
+                width: 55px;
             }
             .mophra-media-col {
                 gap: 8px;
             }
-            .mophra-stream-btn, .mophra-social-btn {
+            .mophra-stream-btn {
                 padding: 12px 18px;
+                font-size: 13px;
+            }
+            .mophra-social-btn {
+                padding: 12px 10px;
                 font-size: 13px;
             }
         }
@@ -418,10 +523,15 @@
                     <div class="mophra-tracklist-col">
                         <div class="mophra-tracklist-header-wrapper">
                             <div class="mophra-tracklist-heading">tracklist</div>
+                            <button type="button" id="mophraPlayAllBtn" class="mophra-play-all-btn" aria-label="Play All Tracks" title="Reproducir todas las pistas en orden">
+                                <span id="mophraPlayAllIcon">▶</span>
+                                <span id="mophraPlayAllText">PLAY ALL</span>
+                            </button>
+                            <span id="mophraGlobalTimer" class="mophra-global-timer">0:00 | -0:00</span>
                         </div>
                         
                         <!-- Pista 01 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra021.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra021.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">01.</span>
@@ -434,6 +544,7 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 02 -->
@@ -450,6 +561,7 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 03 -->
@@ -466,6 +578,7 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 04 -->
@@ -482,6 +595,7 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 05 -->
@@ -498,6 +612,7 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 06 -->
@@ -514,6 +629,7 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 07 -->
@@ -530,10 +646,11 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 08 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra028.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra028.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">08.</span>
@@ -546,10 +663,11 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 09 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra006.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra006.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">09.</span>
@@ -562,10 +680,11 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 10 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra029.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra029.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">10.</span>
@@ -578,10 +697,11 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 11 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra007.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra007.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">11.</span>
@@ -594,10 +714,11 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 12 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra030.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra030.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">12.</span>
@@ -610,10 +731,11 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 13 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra031.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra031.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">13.</span>
@@ -626,10 +748,11 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 14 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra032.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra032.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">14.</span>
@@ -642,10 +765,11 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 15 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra033.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra033.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">15.</span>
@@ -658,10 +782,11 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 16 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra034.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra034.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">16.</span>
@@ -674,10 +799,11 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                         <!-- Pista 17 -->
-                       <div class="mophra-track-item" data-src="../../../audiotracks/mophra035.mp3">
+                        <div class="mophra-track-item" data-src="../../../audiotracks/mophra035.mp3">
                             <div class="mophra-track-left">
                                 <button class="mophra-play-btn" aria-label="Play">▶</button>
                                 <span class="mophra-track-num">17.</span>
@@ -690,6 +816,7 @@
                             <div class="mophra-progress-container">
                                 <div class="mophra-progress-bar"></div>
                             </div>
+                            <span class="mophra-track-timer">0:00 | -0:00</span>
                         </div>
 
                     <!-- 🔘 Botones de plataformas y descarga -->
@@ -1031,14 +1158,37 @@
             });
         })();
 
-        /* --- 🎵 SCRIPT DE REPRODUCTOR CON ANIMACIÓN FÍSICA AVANZADA --- */
+        /* --- 🎵 SCRIPT DE REPRODUCTOR CON CONTADORES INDIVIDUAL Y GLOBAL --- */
         document.addEventListener('DOMContentLoaded', () => {
-            const trackItems = document.querySelectorAll('.mophra-track-item');
+            const trackItems = Array.from(document.querySelectorAll('.mophra-track-item'));
             const discWrap = document.querySelector('.mophra-rotating-image-wrap');
+            const playAllBtn = document.getElementById('mophraPlayAllBtn');
+            const playAllIcon = document.getElementById('mophraPlayAllIcon');
+            const playAllText = document.getElementById('mophraPlayAllText');
+            const globalTimerEl = document.getElementById('mophraGlobalTimer');
+
             let currentAudio = null;
             let currentPlayBtn = null;
             let currentProgressBar = null;
+            let currentTrackIndex = -1;
             let progressInterval = null;
+            let isPlayAllMode = false;
+
+            // --- ⏱️ FORMATEO DE TIEMPO (M:SS | -M:SS) ---
+            function formatSeconds(sec) {
+                if (!isFinite(sec) || sec < 0) sec = 0;
+                const total = Math.floor(sec);
+                const mins = Math.floor(total / 60);
+                const secs = total % 60;
+                return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+
+            function formatTimerDisplay(elapsed, duration) {
+                const safeDuration = (isFinite(duration) && duration > 0) ? duration : 0;
+                const safeElapsed = Math.min(Math.max(0, elapsed), safeDuration || elapsed);
+                const remaining = Math.max(0, safeDuration - safeElapsed);
+                return `${formatSeconds(safeElapsed)} | -${formatSeconds(remaining)}`;
+            }
 
             // --- ⚙️ PARÁMETROS DE FÍSICA Y CINEMÁTICA ---
             let currentAngle = 0;       
@@ -1094,49 +1244,188 @@
                 targetSpeed = 0;
             }
 
-            // --- LÓGICA DE CONTROL DE PISTAS ---
-            trackItems.forEach(item => {
+            function clearTrackStates() {
+                trackItems.forEach(el => {
+                    el.classList.remove('is-active-track');
+                    el.classList.remove('is-playing-single');
+                });
+            }
+
+            function setTrackVisualState(itemEl) {
+                clearTrackStates();
+                if (!itemEl) return;
+                if (isPlayAllMode) {
+                    itemEl.classList.add('is-active-track');
+                } else {
+                    itemEl.classList.add('is-playing-single');
+                }
+            }
+
+            // Construimos el registro de pistas con precarga de metadatos para conocer su duración
+            const tracksRegistry = trackItems.map((item, idx) => {
                 const audioSrc = item.getAttribute('data-src');
                 const playBtn = item.querySelector('.mophra-play-btn');
+                const timerEl = item.querySelector('.mophra-track-timer');
                 const progressBar = item.querySelector('.mophra-progress-bar');
                 const progressContainer = item.querySelector('.mophra-progress-container');
+                const audio = audioSrc ? new Audio(audioSrc) : null;
 
-                if (!audioSrc) return;
+                if (audio) {
+                    audio.preload = 'metadata';
+                    audio.addEventListener('loadedmetadata', () => {
+                        if (timerEl) {
+                            timerEl.textContent = formatTimerDisplay(0, audio.duration);
+                        }
+                        updateGlobalTimer();
+                    });
+                }
 
-                const audio = new Audio(audioSrc);
+                return { index: idx, item, audio, playBtn, timerEl, progressBar, progressContainer };
+            });
+
+            // --- ⏱️ CÁLCULO DEL TIEMPO GLOBAL DE TODAS LAS PISTAS ---
+            function getTotalAlbumDuration() {
+                return tracksRegistry.reduce((acc, t) => {
+                    const d = (t.audio && isFinite(t.audio.duration)) ? t.audio.duration : 0;
+                    return acc + d;
+                }, 0);
+            }
+
+            function updateGlobalTimer() {
+                if (!globalTimerEl) return;
+                const totalDuration = getTotalAlbumDuration();
+
+                if (!isPlayAllMode || currentTrackIndex < 0) {
+                    globalTimerEl.textContent = formatTimerDisplay(0, totalDuration);
+                    globalTimerEl.classList.remove('is-active-global');
+                    return;
+                }
+
+                let elapsedBeforeCurrent = 0;
+                for (let i = 0; i < currentTrackIndex; i++) {
+                    const d = (tracksRegistry[i].audio && isFinite(tracksRegistry[i].audio.duration))
+                        ? tracksRegistry[i].audio.duration
+                        : 0;
+                    elapsedBeforeCurrent += d;
+                }
+
+                const activeTrack = tracksRegistry[currentTrackIndex];
+                const currentElapsed = (activeTrack && activeTrack.audio) ? activeTrack.audio.currentTime : 0;
+                const totalElapsed = elapsedBeforeCurrent + currentElapsed;
+
+                globalTimerEl.textContent = formatTimerDisplay(totalElapsed, totalDuration);
+                globalTimerEl.classList.add('is-active-global');
+            }
+
+            function updatePlayAllUI() {
+                if (!playAllBtn) return;
+                if (isPlayAllMode) {
+                    playAllBtn.classList.add('is-playing-all');
+                    if (playAllIcon) playAllIcon.textContent = '❚❚';
+                    if (playAllText) playAllText.textContent = 'PLAYING ALL';
+                } else {
+                    playAllBtn.classList.remove('is-playing-all');
+                    if (playAllIcon) playAllIcon.textContent = '▶';
+                    if (playAllText) playAllText.textContent = 'PLAY ALL';
+                    clearTrackStates();
+                    updateGlobalTimer();
+                }
+            }
+
+            function resetPreviousTrack(prevIdx) {
+                if (prevIdx < 0 || !tracksRegistry[prevIdx]) return;
+                const prev = tracksRegistry[prevIdx];
+                if (prev.audio) {
+                    prev.audio.pause();
+                    prev.audio.currentTime = 0;
+                }
+                if (prev.playBtn) prev.playBtn.textContent = '▶';
+                if (prev.progressBar) prev.progressBar.style.width = '0%';
+                if (prev.timerEl && prev.audio) {
+                    prev.timerEl.textContent = formatTimerDisplay(0, prev.audio.duration);
+                }
+            }
+
+            function playTrackAt(idx) {
+                const track = tracksRegistry[idx];
+                if (!track || !track.audio) return;
+
+                if (currentAudio && currentAudio !== track.audio) {
+                    resetPreviousTrack(currentTrackIndex);
+                    clearInterval(progressInterval);
+                }
+
+                track.audio.play().then(() => {
+                    track.playBtn.textContent = '❚❚';
+                    currentAudio = track.audio;
+                    currentPlayBtn = track.playBtn;
+                    currentProgressBar = track.progressBar;
+                    currentTrackIndex = idx;
+
+                    setTrackVisualState(track.item);
+                    startSpinning();
+                    updateGlobalTimer();
+
+                    clearInterval(progressInterval);
+                    progressInterval = setInterval(() => {
+                        if (track.audio.duration) {
+                            const percentage = (track.audio.currentTime / track.audio.duration) * 100;
+                            track.progressBar.style.width = percentage + '%';
+                            if (track.timerEl) {
+                                track.timerEl.textContent = formatTimerDisplay(track.audio.currentTime, track.audio.duration);
+                            }
+                            if (isPlayAllMode) {
+                                updateGlobalTimer();
+                            }
+                        }
+                    }, 100);
+                }).catch(err => console.log("Error al reproducir audio:", err));
+            }
+
+            // --- BOTÓN PLAY ALL EN ENCABEZADO 'tracklist' ---
+            if (playAllBtn) {
+                playAllBtn.addEventListener('click', () => {
+                    if (isPlayAllMode) {
+                        isPlayAllMode = false;
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            if (currentPlayBtn) currentPlayBtn.textContent = '▶';
+                            stopSpinning();
+                            clearInterval(progressInterval);
+                        }
+                        currentTrackIndex = -1;
+                        updatePlayAllUI();
+                    } else {
+                        isPlayAllMode = true;
+                        if (currentAudio) {
+                            resetPreviousTrack(currentTrackIndex);
+                            currentAudio = null;
+                            currentTrackIndex = -1;
+                        }
+                        updatePlayAllUI();
+                        playTrackAt(0);
+                    }
+                });
+            }
+
+            // --- LÓGICA DE CONTROL DE PISTAS INDIVIDUALES ---
+            tracksRegistry.forEach(track => {
+                const { index, item, audio, playBtn, timerEl, progressBar, progressContainer } = track;
+                if (!audio) return;
 
                 playBtn.addEventListener('click', () => {
-                    if (currentAudio && currentAudio !== audio) {
-                        currentAudio.pause();
-                        currentAudio.currentTime = 0;
-                        if (currentPlayBtn) currentPlayBtn.textContent = '▶';
-                        if (currentProgressBar) currentProgressBar.style.width = '0%';
-                        clearInterval(progressInterval);
+                    if (isPlayAllMode) {
+                        isPlayAllMode = false;
+                        updatePlayAllUI();
                     }
 
                     if (audio.paused) {
-                        audio.play().then(() => {
-                            playBtn.textContent = '❚❚';
-                            currentAudio = audio;
-                            currentPlayBtn = playBtn;
-                            currentProgressBar = progressBar;
-
-                            startSpinning();
-
-                            clearInterval(progressInterval);
-                            progressInterval = setInterval(() => {
-                                if (audio.duration) {
-                                    const percentage = (audio.currentTime / audio.duration) * 100;
-                                    progressBar.style.width = percentage + '%';
-                                }
-                            }, 100);
-                        }).catch(err => console.log("Error al reproducir audio:", err));
+                        playTrackAt(index);
                     } else {
                         audio.pause();
                         playBtn.textContent = '▶';
-                        
+                        item.classList.remove('is-playing-single');
                         stopSpinning();
-
                         clearInterval(progressInterval);
                     }
                 });
@@ -1144,10 +1433,25 @@
                 audio.addEventListener('ended', () => {
                     playBtn.textContent = '▶';
                     progressBar.style.width = '0%';
-                    
-                    stopSpinning();
-
+                    if (timerEl) {
+                        timerEl.textContent = formatTimerDisplay(0, audio.duration);
+                    }
                     clearInterval(progressInterval);
+
+                    if (isPlayAllMode) {
+                        const nextIndex = index + 1;
+                        if (nextIndex < tracksRegistry.length) {
+                            playTrackAt(nextIndex);
+                        } else {
+                            isPlayAllMode = false;
+                            currentTrackIndex = -1;
+                            updatePlayAllUI();
+                            stopSpinning();
+                        }
+                    } else {
+                        item.classList.remove('is-playing-single');
+                        stopSpinning();
+                    }
                 });
 
                 progressContainer.addEventListener('click', (e) => {
@@ -1156,11 +1460,17 @@
                     const clickPosition = (e.clientX - rect.left) / rect.width;
                     audio.currentTime = clickPosition * audio.duration;
                     progressBar.style.width = (clickPosition * 100) + '%';
+                    if (timerEl) {
+                        timerEl.textContent = formatTimerDisplay(audio.currentTime, audio.duration);
+                    }
+                    if (isPlayAllMode && currentTrackIndex === index) {
+                        updateGlobalTimer();
+                    }
                 });
             });
         });
 
-       /* --- SCRIPT MARQUEE CORREGIDO --- */
+        /* --- SCRIPT MARQUEE CORREGIDO --- */
         window.addEventListener('load', () => {
             const wrappers = document.querySelectorAll('.track-marquee-wrapper');
             
