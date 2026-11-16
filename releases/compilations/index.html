@@ -435,7 +435,7 @@
             opacity: 0.75;
         }
 
-        /* --- COVER INTERACTIVO EN VISTA PC (EXPANSIÓN CASI 4X ARRIBA DE LA FRANJA) --- */
+        /* --- COVER INTERACTIVO EN VISTA PC (SOLO CLIC + REFLEJO CON SEGUIMIENTO DEL MOUSE) --- */
         @media (min-width: 768px) {
             #cover-wrapper {
                 position: relative;
@@ -452,15 +452,21 @@
                 height: 80px;
                 cursor: pointer;
                 z-index: 40;
+                transform-style: preserve-3d;
+                will-change: width, height, bottom, transform;
                 transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
                             height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
                             bottom 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                            transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
                             box-shadow 0.35s ease,
                             border-color 0.35s ease;
             }
 
-            /* Se abre casi 4x más grande (310x310px) justo arriba de la franja inferior */
-            #cover-wrapper:hover #cover-box,
+            #cover-box:hover {
+                border-color: rgba(255, 255, 255, 0.55);
+            }
+
+            /* Se despliega casi 4x más grande (310x310px) ÚNICAMENTE al dar clic */
             #cover-wrapper.cover-expanded #cover-box {
                 width: 310px;
                 height: 310px;
@@ -470,16 +476,20 @@
                 z-index: 100;
             }
 
-            /* Puente invisible para mantener el hover suave entre la miniatura y la imagen grande */
-            #cover-wrapper:hover::before,
-            #cover-wrapper.cover-expanded::before {
-                content: '';
+            /* Capa de reflejo brillante que sigue el mouse */
+            #cover-glare {
                 position: absolute;
-                bottom: 0;
-                right: 0;
-                width: 310px;
-                height: 425px;
-                z-index: 30;
+                inset: 0;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.28s ease;
+                mix-blend-mode: screen;
+                background: radial-gradient(
+                    circle 140px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    rgba(255, 255, 255, 0.45) 0%,
+                    rgba(255, 255, 255, 0.14) 38%,
+                    rgba(255, 255, 255, 0) 75%
+                );
             }
         }
 
@@ -635,11 +645,12 @@
                         </p>
                     </div>
 
-                    <!-- COVER EN VISTA PC (HOVER / CLICK EXPANDIBLE) -->
+                    <!-- COVER EN VISTA PC (SOLO CLIC PARA AMPLIAR + REFLEJO INTERACTIVO) -->
                     <div class="hidden md:flex w-auto items-center justify-end border-l border-white/15 pl-6">
-                        <div id="cover-wrapper" title="Pasa el cursor o haz clic para ampliar">
+                        <div id="cover-wrapper" title="Haz clic para ampliar">
                             <div id="cover-box" class="rounded-md overflow-hidden bg-gray-900 border border-white/20">
-                                <img id="data-cover-img" src="" alt="Album Cover" class="w-full h-full object-cover block">
+                                <img id="data-cover-img" src="" alt="Album Cover" class="w-full h-full object-cover block pointer-events-none">
+                                <div id="cover-glare"></div>
                             </div>
                         </div>
                     </div>
@@ -681,19 +692,54 @@
         const dataCoverImg = document.getElementById('data-cover-img');
         const viewNowBtn = document.getElementById('view-now-btn');
         const coverWrapper = document.getElementById('cover-wrapper');
+        const coverBox = document.getElementById('cover-box');
+        const coverGlare = document.getElementById('cover-glare');
 
-        // Interacción de clic para fijar/cerrar el cover ampliado en PC
-        if (coverWrapper) {
-            coverWrapper.addEventListener('click', (e) => {
+        // Interacción de clic exclusivo y reflejo con seguimiento del mouse en PC
+        if (coverWrapper && coverBox) {
+            coverBox.addEventListener('click', (e) => {
                 if (window.innerWidth >= 768) {
                     e.stopPropagation();
                     coverWrapper.classList.toggle('cover-expanded');
                 }
             });
 
+            // Cerrar al hacer clic fuera de la imagen
             document.addEventListener('click', (e) => {
-                if (!coverWrapper.contains(e.target)) {
+                if (coverWrapper.classList.contains('cover-expanded') && !coverBox.contains(e.target)) {
                     coverWrapper.classList.remove('cover-expanded');
+                }
+            });
+
+            // Seguimiento del mouse para el reflejo + inclinación sutil 3D
+            coverBox.addEventListener('mousemove', (e) => {
+                if (window.innerWidth < 768) return;
+                const rect = coverBox.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const percentX = (x / rect.width) * 100;
+                const percentY = (y / rect.height) * 100;
+
+                // Inclinación leve según posición del cursor
+                const rotateY = ((x / rect.width) - 0.5) * 10;
+                const rotateX = ((y / rect.height) - 0.5) * -10;
+
+                coverBox.style.transition = 'width 0.35s cubic-bezier(0.22, 1, 0.36, 1), height 0.35s cubic-bezier(0.22, 1, 0.36, 1), bottom 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease';
+                coverBox.style.transform = `perspective(700px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+
+                if (coverGlare) {
+                    coverGlare.style.setProperty('--mouse-x', `${percentX}%`);
+                    coverGlare.style.setProperty('--mouse-y', `${percentY}%`);
+                    coverGlare.style.opacity = '1';
+                }
+            });
+
+            coverBox.addEventListener('mouseleave', () => {
+                coverBox.style.transition = '';
+                coverBox.style.transform = '';
+                if (coverGlare) {
+                    coverGlare.style.opacity = '0';
                 }
             });
         }
