@@ -412,25 +412,6 @@
             padding-top: 25px;
         }
 
-        /* --- CORRECCIÓN DEL BANNER ANIMADO (.WEBP) --- */
-        #menu-banner-container {
-            position: relative;
-            width: 100%;
-            height: 110px;
-            border-radius: 6px;
-            overflow: hidden;
-            background-color: transparent !important;
-            box-shadow: none;
-        }
-
-        #menu-banner-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain !important;
-            object-position: center;
-            background: transparent !important;
-        }
-
         /* --- ESTILOS DE CRISTAL UNIFICADOS (PC Y MÓVIL) --- */
         #data-glass-card {
             background-color: rgba(15, 15, 20, 0.6) !important;
@@ -452,6 +433,54 @@
         #data-contains-label,
         #data-desc-label {
             opacity: 0.75;
+        }
+
+        /* --- COVER INTERACTIVO EN VISTA PC (EXPANSIÓN CASI 4X ARRIBA DE LA FRANJA) --- */
+        @media (min-width: 768px) {
+            #cover-wrapper {
+                position: relative;
+                width: 80px;
+                height: 80px;
+                flex-shrink: 0;
+            }
+
+            #cover-box {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 80px;
+                height: 80px;
+                cursor: pointer;
+                z-index: 40;
+                transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                            height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                            bottom 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                            box-shadow 0.35s ease,
+                            border-color 0.35s ease;
+            }
+
+            /* Se abre casi 4x más grande (310x310px) justo arriba de la franja inferior */
+            #cover-wrapper:hover #cover-box,
+            #cover-wrapper.cover-expanded #cover-box {
+                width: 310px;
+                height: 310px;
+                bottom: 108px;
+                border-color: rgba(255, 0, 85, 0.85);
+                box-shadow: 0 24px 55px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 0, 85, 0.45);
+                z-index: 100;
+            }
+
+            /* Puente invisible para mantener el hover suave entre la miniatura y la imagen grande */
+            #cover-wrapper:hover::before,
+            #cover-wrapper.cover-expanded::before {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 310px;
+                height: 425px;
+                z-index: 30;
+            }
         }
 
         @media (max-width: 767px) {
@@ -490,10 +519,6 @@
             .menu-item.active {
                 transform: none !important;
                 box-shadow: 0 0 14px rgba(255, 0, 85, 0.65) !important;
-            }
-
-            #menu-banner-container {
-                height: 70px !important;
             }
 
             #mobile-footer-wrapper {
@@ -570,11 +595,6 @@
 
             <div id="menu-list" class="custom-scrollbar pr-2"></div>
 
-            <!-- Banner Decorativo Dinámico -->
-            <div id="menu-banner-container" class="relative w-full h-24 rounded overflow-hidden">
-                <img id="menu-banner-img" src="" alt="Banner Decorativo" class="w-full h-full">
-            </div>
-
         </aside>
     </main>
 
@@ -615,9 +635,12 @@
                         </p>
                     </div>
 
+                    <!-- COVER EN VISTA PC (HOVER / CLICK EXPANDIBLE) -->
                     <div class="hidden md:flex w-auto items-center justify-end border-l border-white/15 pl-6">
-                        <div class="w-20 h-20 rounded-md overflow-hidden bg-gray-900 flex-shrink-0 border border-white/20">
-                            <img id="data-cover-img" src="" alt="Album Cover" class="w-full h-full object-cover block">
+                        <div id="cover-wrapper" title="Pasa el cursor o haz clic para ampliar">
+                            <div id="cover-box" class="rounded-md overflow-hidden bg-gray-900 border border-white/20">
+                                <img id="data-cover-img" src="" alt="Album Cover" class="w-full h-full object-cover block">
+                            </div>
                         </div>
                     </div>
 
@@ -639,7 +662,6 @@
                 description: "Inspired by intense club and underground energy, the label symbolizes this power as a USB drive overheating from the sheer intensity of its tracks.",
                 bgVideoDesktop: "./mophra-presents-usb-hot/backg-pc.webm",
                 bgVideoMobile: "./mophra-presents-usb-hot/backg-movil.webm",
-                bannerImage: "./mophra-presents-usb-hot/allartists.webp",
                 coverImage: "./mophra-presents-usb-hot/017-usbhot.webp"
             }  
         ];
@@ -651,7 +673,6 @@
         const bgLayer1 = document.getElementById('bg-layer-1');
         const bgLayer2 = document.getElementById('bg-layer-2');
         const menuList = document.getElementById('menu-list');
-        const menuBannerImg = document.getElementById('menu-banner-img');
 
         const dataCatalog = document.getElementById('data-catalog');
         const dataTitle = document.getElementById('data-title');
@@ -659,6 +680,23 @@
         const dataDescription = document.getElementById('data-description');
         const dataCoverImg = document.getElementById('data-cover-img');
         const viewNowBtn = document.getElementById('view-now-btn');
+        const coverWrapper = document.getElementById('cover-wrapper');
+
+        // Interacción de clic para fijar/cerrar el cover ampliado en PC
+        if (coverWrapper) {
+            coverWrapper.addEventListener('click', (e) => {
+                if (window.innerWidth >= 768) {
+                    e.stopPropagation();
+                    coverWrapper.classList.toggle('cover-expanded');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!coverWrapper.contains(e.target)) {
+                    coverWrapper.classList.remove('cover-expanded');
+                }
+            });
+        }
 
         // Helper para asegurar reproducción silenciada en iOS / Safari / Brave
         function safePlayVideo(videoEl) {
@@ -835,11 +873,10 @@
 
             const dataCard = document.getElementById('data-glass-card');
             const textElements = [dataCatalog, dataDescription];
-            const mediaElements = [dataCoverImg, menuBannerImg];
             
             dataCard.classList.remove('card-pulse-transition');
             textElements.forEach(el => el.classList.remove('fade-in-element'));
-            mediaElements.forEach(el => el.classList.remove('cover-zoom-in'));
+            if (dataCoverImg) dataCoverImg.classList.remove('cover-zoom-in');
             
             void dataCard.offsetWidth;
 
@@ -848,12 +885,11 @@
             animateTrackCount(dataTracks, item.tracks, 850);
             dataDescription.textContent = item.description;
             if (dataCoverImg) dataCoverImg.src = item.coverImage;
-            menuBannerImg.src = item.bannerImage;
             if (viewNowBtn) viewNowBtn.setAttribute('href', item.url);
 
             dataCard.classList.add('card-pulse-transition');
             textElements.forEach(el => el.classList.add('fade-in-element'));
-            mediaElements.forEach(el => el.classList.add('cover-zoom-in'));
+            if (dataCoverImg) dataCoverImg.classList.add('cover-zoom-in');
         }
 
         // Si el usuario cambia el tamaño de ventana entre PC y Móvil, actualiza el video correspondiente
