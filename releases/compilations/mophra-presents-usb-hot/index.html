@@ -50,54 +50,265 @@
             overflow-x: hidden;
         }
 
-        /* --- 💿 DISCO FIJO AL CENTRO --- */
-        .mophra-fixed-disc-container {
+        /* --- 🔌 SISTEMA DE CONEXIÓN USB FIJO AL MARGEN DERECHO --- */
+        .mophra-usb-dock-container {
             position: fixed;
             top: 0;
-            left: 0;
+            right: 0;
             width: 100vw;
             height: 100vh;
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: center;
             z-index: 1;
             pointer-events: none;
             box-sizing: border-box;
-            contain: layout style paint;
+            overflow: hidden;
         }
 
-        .mophra-rotating-image-wrap {
-            width: 450px;
-            height: 450px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            backface-visibility: hidden;
-            will-change: transform, filter;
+        /* Escenario cuadrado sincronizado para que ambas piezas escalen idéntico */
+        .mophra-usb-stage {
+            position: relative;
+            height: 92vh;
+            width: 92vh;
+            max-width: 960px;
+            max-height: 960px;
+            flex-shrink: 0;
         }
 
-        .mophra-rotating-image-wrap img {
+        /* Capa Base: Estructura pegada al margen derecho */
+        .mophra-dock-base {
+            position: absolute;
+            top: 0;
+            right: 0;
             width: 100%;
             height: 100%;
             object-fit: contain;
+            object-position: right center;
+            z-index: 2;
             display: block;
-            filter: drop-shadow(0px 15px 25px rgba(0, 0, 0, 0.6));
+            filter: drop-shadow(-12px 15px 25px rgba(0, 0, 0, 0.65));
         }
 
-        @media (min-width: 840px) {
-            .mophra-rotating-image-wrap { 
-                width: 720px; 
-                height: 720px; 
+        /* Capa Superior: LEDs con micro-parpadeo rápido + efecto de entrada y salida */
+        .mophra-dock-leds {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: right center;
+            z-index: 3;
+            display: block;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.28s ease-out;
+            will-change: opacity;
+        }
+
+        .mophra-usb-stage.is-connected .mophra-dock-leds {
+            opacity: 1;
+            transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.14s;
+        }
+
+        .mophra-usb-stage.is-track-playing .mophra-dock-leds {
+            opacity: 1;
+            animation:
+                mophraRedLedEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+                mophraRedLedFault 0.32s steps(1, end) 0.12s infinite;
+        }
+
+        .mophra-usb-stage.is-led-exiting .mophra-dock-leds {
+            animation: mophraRedLedExit 0.32s ease-out forwards;
+        }
+
+        @keyframes mophraRedLedEnter {
+            0% {
+                opacity: 0;
             }
-            .mophra-fixed-disc-container {
-                transform: translateX(190px);
+            65% {
+                opacity: 1;
+            }
+            82% {
+                opacity: 0.45;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes mophraRedLedExit {
+            0% {
+                opacity: 0.85;
+            }
+            50% {
+                opacity: 0.35;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes mophraRedLedFault {
+            0% {
+                opacity: 1;
+            }
+            18% {
+                opacity: 0.35;
+            }
+            26% {
+                opacity: 1;
+            }
+            62% {
+                opacity: 0.92;
+            }
+            70% {
+                opacity: 0.22;
+            }
+            78% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Capa Extra: LED verde con encendido suave y caída en seco mientras corre el track */
+        .mophra-dock-green-led {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: right center;
+            z-index: 5;
+            display: block;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.45s ease-out;
+            will-change: opacity;
+        }
+
+        .mophra-usb-stage.is-track-playing .mophra-dock-green-led {
+            transition: opacity 0.25s ease-in 0.12s;
+            animation: mophraGreenLedPulse 2.2s linear infinite;
+        }
+
+        @keyframes mophraGreenLedPulse {
+            0% {
+                opacity: 0.08;
+                animation-timing-function: ease-in-out;
+            }
+            78% {
+                opacity: 1;
+                animation-timing-function: cubic-bezier(0.7, 0, 1, 0.4);
+            }
+            100% {
+                opacity: 0.08;
+            }
+        }
+
+        /* Capa Extra: LED adicional sin efectos, solo encendido al reproducir y apagado al detener */
+        .mophra-dock-extra-led {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: right center;
+            z-index: 4;
+            display: block;
+            opacity: 0;
+            pointer-events: none;
+            will-change: opacity;
+        }
+
+        .mophra-usb-stage.is-track-playing .mophra-dock-extra-led {
+            opacity: 1;
+        }
+
+        /* Capa Inferior: Memoria USB con curva realista de extracción (al desconectar) */
+        .mophra-usb-drive {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 1;
+            display: block;
+            transform: translate3d(-13%, 6%, 0);
+            will-change: transform;
+            filter: drop-shadow(0px 14px 20px rgba(0, 0, 0, 0.7));
+        }
+
+        /* Entrada con empuje y asentamiento tipo "clic" */
+        .mophra-usb-stage.is-connected .mophra-usb-drive {
+            animation: mophraUsbPlugClick 0.34s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+        }
+
+        /* Salida con vibración muy leve y deslizamiento suave */
+        .mophra-usb-stage.is-disconnected .mophra-usb-drive {
+            animation: mophraUsbUnplugVibe 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes mophraUsbPlugClick {
+            0% {
+                transform: translate3d(-13%, 6%, 0);
+            }
+            72% {
+                transform: translate3d(0.9%, 6%, 0);
+            }
+            88% {
+                transform: translate3d(0.15%, 6%, 0);
+            }
+            100% {
+                transform: translate3d(0.4%, 6%, 0);
+            }
+        }
+
+        @keyframes mophraUsbUnplugVibe {
+            0% {
+                transform: translate3d(0.4%, 6%, 0);
+            }
+            10% {
+                transform: translate3d(0.65%, 6%, 0);
+            }
+            20% {
+                transform: translate3d(0.15%, 6%, 0);
+            }
+            30% {
+                transform: translate3d(0.55%, 6%, 0);
+            }
+            40% {
+                transform: translate3d(0.2%, 6%, 0);
+            }
+            100% {
+                transform: translate3d(-13%, 6%, 0);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .mophra-usb-stage {
+                height: 62vh;
+                width: 62vh;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .mophra-usb-stage {
+                height: 48vh;
+                width: 48vh;
             }
         }
 
         /* --- 📜 CONTENEDOR PRINCIPAL DE CONTENIDO --- */
         .mophra-content-flow {
             position: relative;
-            z-index: 3;
+            z-index: 5;
             width: 100%;
             min-height: 100vh;
             display: flex;
@@ -495,10 +706,19 @@
 </head>
 <body>
 
-    <!-- Disco Fijo al Centro -->
-    <div class="mophra-fixed-disc-container">
-        <div class="mophra-rotating-image-wrap">
-            <img src="../../../releases/compilations/mophra-presents-usb-hot/usb-hot.webp" alt="MOPHRA Release Art">
+    <!-- Sistema USB Fijo al Margen Derecho -->
+    <div class="mophra-usb-dock-container">
+        <div class="mophra-usb-stage" id="mophraUsbStage">
+            <!-- Capa Inferior: Memoria USB que se conecta al reproducir -->
+            <img src="../../../releases/compilations/mophra-presents-usb-hot/this-usb.webp" alt="MOPHRA USB Drive" class="mophra-usb-drive">
+            <!-- Capa Media: Estructura pegada a la derecha -->
+            <img src="../../../releases/compilations/mophra-presents-usb-hot/estruc.webp" alt="USB Dock Base" class="mophra-dock-base">
+            <!-- Capa Superior: LEDs con micro-parpadeo rápido + efecto de entrada y salida -->
+            <img src="../../../releases/compilations/mophra-presents-usb-hot/led-rojo.webp" alt="USB Dock LEDs" class="mophra-dock-leds">
+            <!-- Capa Extra 1: LED adicional sin efectos, solo encendido al reproducir y apagado al detener -->
+            <img src="../../../releases/compilations/mophra-presents-usb-hot/display.gif" alt="USB Dock Extra LED" class="mophra-dock-extra-led">
+            <!-- Capa Extra 2: LED verde con respiración suave y caída en seco mientras corre el track -->
+            <img src="../../../releases/compilations/mophra-presents-usb-hot/led-verde.webp" alt="USB Dock Green LED" class="mophra-dock-green-led">
         </div>
     </div>
 
@@ -1158,10 +1378,10 @@
             });
         })();
 
-        /* --- 🎵 SCRIPT DE REPRODUCTOR CON CONTADORES INDIVIDUAL Y GLOBAL --- */
+        /* --- 🎵 SCRIPT DE REPRODUCTOR CON CONEXIÓN USB Y CONTADORES --- */
         document.addEventListener('DOMContentLoaded', () => {
             const trackItems = Array.from(document.querySelectorAll('.mophra-track-item'));
-            const discWrap = document.querySelector('.mophra-rotating-image-wrap');
+            const usbStage = document.getElementById('mophraUsbStage');
             const playAllBtn = document.getElementById('mophraPlayAllBtn');
             const playAllIcon = document.getElementById('mophraPlayAllIcon');
             const playAllText = document.getElementById('mophraPlayAllText');
@@ -1173,6 +1393,7 @@
             let currentTrackIndex = -1;
             let progressInterval = null;
             let isPlayAllMode = false;
+            let ledExitTimeout = null;
 
             // --- ⏱️ FORMATEO DE TIEMPO (M:SS | -M:SS) ---
             function formatSeconds(sec) {
@@ -1190,58 +1411,35 @@
                 return `${formatSeconds(safeElapsed)} | -${formatSeconds(remaining)}`;
             }
 
-            // --- ⚙️ PARÁMETROS DE FÍSICA Y CINEMÁTICA ---
-            let currentAngle = 0;       
-            let currentSpeed = 0;       
-            let targetSpeed = 0;        
-            const MAX_SPEED = 24.0;      
-            const ACCELERATION = 0.09;  
-            const DECELERATION = 0.10;  
-            let animationFrameId = null;
-
-            function updateDiscRotation() {
-                if (currentSpeed < targetSpeed) {
-                    currentSpeed = Math.min(targetSpeed, currentSpeed + ACCELERATION);
-                } else if (currentSpeed > targetSpeed) {
-                    currentSpeed = Math.max(targetSpeed, currentSpeed - DECELERATION);
-                }
-
-                if (currentSpeed > 0.002) {
-                    currentAngle = (currentAngle + currentSpeed) % 360;
-
-                    let blurAmount = 0;
-                    const blurThreshold = MAX_SPEED * 2.64; 
-
-                    if (currentSpeed > blurThreshold) {
-                        const normalizedSpeed = (currentSpeed - blurThreshold) / (MAX_SPEED - blurThreshold);
-                        blurAmount = normalizedSpeed * 3.2; 
-                    }
-
-                    if (discWrap) {
-                        discWrap.style.transform = `rotate(${currentAngle}deg)`;
-                        discWrap.style.filter = `blur(${blurAmount}px)`;
-                    }
-
-                    animationFrameId = requestAnimationFrame(updateDiscRotation);
-                } else {
-                    currentSpeed = 0;
-                    if (discWrap) {
-                        discWrap.style.filter = 'blur(0px)';
-                    }
-                    cancelAnimationFrame(animationFrameId);
-                    animationFrameId = null;
+            // --- 🔌 ACTIVAR / DESACTIVAR CONEXIÓN USB Y LEDS ---
+            function connectUsb() {
+                if (usbStage) {
+                    clearTimeout(ledExitTimeout);
+                    usbStage.classList.remove('is-led-exiting');
+                    usbStage.classList.remove('is-disconnected');
+                    usbStage.classList.add('is-connected');
+                    usbStage.classList.add('is-track-playing');
                 }
             }
 
-            function startSpinning() {
-                targetSpeed = MAX_SPEED;
-                if (!animationFrameId) {
-                    animationFrameId = requestAnimationFrame(updateDiscRotation);
-                }
-            }
+            function disconnectUsb() {
+                if (usbStage) {
+                    const wasPlaying = usbStage.classList.contains('is-track-playing');
+                    usbStage.classList.remove('is-track-playing');
 
-            function stopSpinning() {
-                targetSpeed = 0;
+                    if (wasPlaying) {
+                        clearTimeout(ledExitTimeout);
+                        usbStage.classList.add('is-led-exiting');
+                        ledExitTimeout = setTimeout(() => {
+                            usbStage.classList.remove('is-led-exiting');
+                        }, 320);
+                    }
+
+                    if (usbStage.classList.contains('is-connected')) {
+                        usbStage.classList.remove('is-connected');
+                        usbStage.classList.add('is-disconnected');
+                    }
+                }
             }
 
             function clearTrackStates() {
@@ -1363,7 +1561,7 @@
                     currentTrackIndex = idx;
 
                     setTrackVisualState(track.item);
-                    startSpinning();
+                    connectUsb();
                     updateGlobalTimer();
 
                     clearInterval(progressInterval);
@@ -1390,7 +1588,7 @@
                         if (currentAudio) {
                             currentAudio.pause();
                             if (currentPlayBtn) currentPlayBtn.textContent = '▶';
-                            stopSpinning();
+                            disconnectUsb();
                             clearInterval(progressInterval);
                         }
                         currentTrackIndex = -1;
@@ -1425,7 +1623,7 @@
                         audio.pause();
                         playBtn.textContent = '▶';
                         item.classList.remove('is-playing-single');
-                        stopSpinning();
+                        disconnectUsb();
                         clearInterval(progressInterval);
                     }
                 });
@@ -1446,11 +1644,11 @@
                             isPlayAllMode = false;
                             currentTrackIndex = -1;
                             updatePlayAllUI();
-                            stopSpinning();
+                            disconnectUsb();
                         }
                     } else {
                         item.classList.remove('is-playing-single');
-                        stopSpinning();
+                        disconnectUsb();
                     }
                 });
 
