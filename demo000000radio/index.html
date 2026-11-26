@@ -1,0 +1,153 @@
+<style>
+/* =1. CONTENEDOR FIJO DE PANTALLA COMPLETA= */
+.mophra-seccion-full {
+position: fixed !important;
+top: 0 !important;
+left: 0 !important;
+width: 100vw !important;
+height: 100vh !important;
+background-color: #000000;
+display: flex !important;
+justify-content: center !important;
+align-items: center !important;
+margin: 0 !important;
+padding: 0 !important;
+overflow: hidden !important;
+z-index: 9999 !important;
+}
+
+/* 🎬 CAPA DEL APARATO CON ANIMACIÓN DE ENTRADA DESDE ARRIBA */
+.mophra-radio-wrapper {
+position: relative;
+width: 100%;
+max-width: 1600px;
+height: auto;
+display: block;
+margin: 0 !important;
+padding: 0 !important;
+
+/* Invoca la animación: dura 0.9 segundos, inicia suave y termina suave */
+animation: mophraEntradaSlide 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* 🧠 DEFINICIÓN DE LA ANIMACIÓN (Pureza visual sin desfasar el mapa) */
+@keyframes mophraEntradaSlide {
+0% {
+opacity: 0;
+transform: translateY(-80px); /* Inicia 80 píxeles más arriba */
+}
+100% {
+opacity: 1;
+transform: translateY(0); /* Termina en su posición exacta y real */
+}
+}
+
+/* =2. CAPAS VISUALES APILADAS (Misma dimensión)= */
+.mophra-radio-wrapper img {
+width: 100%;
+height: auto;
+display: block;
+position: absolute;
+top: 0;
+left: 0;
+}
+
+/* Capa Base OFF */
+#id1 {
+position: relative !important;
+z-index: 1;
+pointer-events: none;
+}
+
+/* Capa Animación GIF ON */
+#id2 {
+z-index: 2;
+pointer-events: none;
+opacity: 0;
+}
+
+/* Capas de Iluminación de Botones Individuales */
+.luz-boton {
+z-index: 3;
+pointer-events: none;
+opacity: 0;
+transition: opacity 0.1s ease-in-out;
+}
+
+/* Capa del Mapa SVG (Hasta arriba) */
+.mophra-svg-overlay {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: 4 !important;
+}
+
+.botón-svg-clicable {
+pointer-events: auto !important;
+cursor: pointer;
+fill: transparent !important;
+fill-opacity: 0 !important;
+stroke: transparent !important;
+outline: none !important;
+-webkit-tap-highlight-color: transparent;
+}
+
+.botón-svg-clicable:hover,
+.botón-svg-clicable:active,
+.botón-svg-clicable:focus {
+fill: transparent !important;
+fill-opacity: 0 !important;
+}
+
+/* =3. AJUSTE EXCLUSIVO PARA CELULARES= */
+@media screen and (max-width: 768px) {
+.mophra-radio-wrapper {
+width: 140% !important;
+max-width: none !important;
+flex-shrink: 0 !important;
+}
+}
+</style>
+
+<div class="mophra-seccion-full">
+<div class="mophra-radio-wrapper" id="mophra-wrapper-estado">
+
+<img src="https://i.ibb.co/Z1x1wMbf/CASCASA-OFF.png" id="id1" alt="Mophra Off">
+
+<img src="https://i.ibb.co/Ng64VyQt/move.gif" id="id2" alt="Mophra On">
+
+<img src="https://i.ibb.co/RTQhWtMM/bt-atras.png" id="bt1" class="luz-boton" alt="Prev Glow">
+<img src="https://i.ibb.co/k2W5Mb8m/bt-stop.png" id="bt2" class="luz-boton" alt="Stop Glow">
+<img src="https://i.ibb.co/RptK2yjs/bt-play.png" id="bt3" class="luz-boton" alt="Play Glow">
+<img src="https://i.ibb.co/b4xhq82/bt-sigu.png" id="bt4" class="luz-boton" alt="Next Glow">
+
+<audio id="mophra-reproductor" data-current="1" src="https://raw.githubusercontent.com/gatos64lcts/website/audiotrack/mophra001.mp3" preload="auto"></audio>
+
+<svg viewBox="0 0 1700 900" class="mophra-svg-overlay" xmlns="http://www.w3.org/2000/svg">
+
+<polygon id="btn-mophra-prev" class="botón-svg-clicable" points="614.74,583.09 651.38,627.34 724.36,627.34 693.38,548.32 575.14,548.32 575.14,582.74 575.14,583.09"
+onmouseover="document.getElementById('bt1').style.opacity='1';"
+onmouseout="document.getElementById('bt1').style.opacity='0';"
+onclick="var r=document.getElementById('mophra-reproductor'); var s=!r.paused; var c=parseInt(r.getAttribute('data-current')); var n; do{n=Math.floor(Math.random()*20)+1;}while(n===c); r.setAttribute('data-current',n); var p=String(n).padStart(3,'0'); r.src='https://raw.githubusercontent.com/gatos64lcts/audiotracks/main/m'+p+'.mp3'; if(s){r.play();}" />
+
+<polygon id="btn-mophra-stop" class="botón-svg-clicable" points="753.3,628.02 837.64,628.02 837.64,548.32 725.72,548.32"
+onmouseover="document.getElementById('bt2').style.opacity='1';"
+onmouseout="document.getElementById('bt2').style.opacity='0';"
+onclick="document.getElementById('mophra-reproductor').pause(); document.getElementById('id2').style.opacity='0'; document.getElementById('id1').style.opacity='1';" />
+
+<polygon id="btn-mophra-play" class="botón-svg-clicable" points="943.87,627.98 859.52,627.98 859.52,548.28 971.44,548.28"
+onmouseover="document.getElementById('bt3').style.opacity='1';"
+onmouseout="document.getElementById('bt3').style.opacity='0';"
+onclick="var r=document.getElementById('mophra-reproductor'); r.play(); document.getElementById('id1').style.opacity='0'; document.getElementById('id2').style.opacity='1'; r.onended=function(){ var c=parseInt(r.getAttribute('data-current')); var n; do{n=Math.floor(Math.random()*20)+1;}while(n===c); r.setAttribute('data-current',n); var p=String(n).padStart(3,'0'); r.src='https://raw.githubusercontent.com/gatos64lcts/audiotracks/main/m'+p+'.mp3'; r.play(); };" />
+
+<polygon id="btn-mophra-next" class="botón-svg-clicable" points="1085.26,583.09 1048.62,627.34 975.64,627.34 1006.61,548.32 1122.86,548.32 1122.86,582.24 1122.86,583.09"
+onmouseover="document.getElementById('bt4').style.opacity='1';"
+onmouseout="document.getElementById('bt4').style.opacity='0';"
+onclick="var r=document.getElementById('mophra-reproductor'); var s=!r.paused; var c=parseInt(r.getAttribute('data-current')); var n; do{n=Math.floor(Math.random()*20)+1;}while(n===c); r.setAttribute('data-current',n); var p=String(n).padStart(3,'0'); r.src='https://raw.githubusercontent.com/gatos64lcts/audiotracks/main/m'+p+'.mp3'; if(s){r.play();}" />
+
+</svg>
+
+</div>
+</div>
